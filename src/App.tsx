@@ -5,7 +5,7 @@ import SignUp from './components/signUp/SignUp';
 import LogIn from './components/logIn/LogIn';
 
 const client = new ApolloClient({
-  uri: "http://localhost:8000",
+  uri: "https://cubopedia-back.herokuapp.com/",
   cache: new InMemoryCache(),
 });
 
