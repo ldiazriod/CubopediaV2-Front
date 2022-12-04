@@ -1,6 +1,6 @@
 import styled, { StyledComponent } from "styled-components";
 
-const MainDiv: StyledComponent<"div", any, {}, never> = styled.div`
+export const MainDiv: StyledComponent<"div", any, {}, never> = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -11,4 +11,13 @@ const MainDiv: StyledComponent<"div", any, {}, never> = styled.div`
     min-width: 100vw;
     background-color: #F5F5F5;
 `
-export default MainDiv
+
+export const MainDivRe: StyledComponent<"div", any, {}, never> = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    width: 100%;
+    background-color: #F5F5F5;
+`
