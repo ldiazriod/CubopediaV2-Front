@@ -4,7 +4,7 @@ import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
 import Modal from "react-modal";
 import parse from "html-react-parser";
 
-import MainDiv from "../../../styles/globalStyles";
+import {MainDivRe} from "../../../styles/globalStyles";
 import TextArea from "../../others/TextArea";
 
 Modal.setAppElement("body")
@@ -54,19 +54,19 @@ const ADD_CARD_CUBE = gql`
     }
 `
 
+const defaultCubeState = {
+    creator: "",
+    cubeName: "",
+    cubeDimensions: "",
+    cardMainTitle: "",
+    cardText: "",
+    cardReviewPoints: 0,
+    cardImg: "",
+    public: false
+}
 
 //getCubesByUser
 const MyCubes = (props: Props): JSX.Element => {
-    const defaultCubeState = {
-        creator: props.creator,
-        cubeName: "",
-        cubeDimensions: "",
-        cardMainTitle: "",
-        cardText: "",
-        cardReviewPoints: 0,
-        cardImg: "",
-        public: false
-    }
     const {data, error, loading, refetch} = useQuery<{getCubesByUser: PersonalCubeInfo[]}>(GET_USER_CUBES, {
         variables: {
             authToken: props.authToken
@@ -76,7 +76,8 @@ const MyCubes = (props: Props): JSX.Element => {
     const [selectValue, setSelectValue] = useState<boolean | undefined>(undefined)
     const [addCube, setAddCube] = useState<boolean>(false)
     const [auxText, setAuxText] = useState<string>("")
-    const [cubeInfo, setCubeInfo] = useState<PersonalCubeInfo>(defaultCubeState)
+    const [inputStates, setInputStates] = useState<boolean[]>([])
+    const [cubeInfo, setCubeInfo] = useState<PersonalCubeInfo>({...defaultCubeState, creator: props.creator})
     const [addCubeMutation] = useMutation(ADD_CARD_CUBE, {
         variables: {
             info: cubeInfo
@@ -93,47 +94,63 @@ const MyCubes = (props: Props): JSX.Element => {
         setModal(false)
     }
 
+    const onFinish = () => {
+        const aux = Object.entries(cubeInfo).map(([key, value]) => {
+            if(key !== "cubeModel" && key !== "cubeBrand" && key !== "cubeDesigner" && key !== "public"){
+                if(value.toString().length !== 0){
+                    if(selectValue && key === "cubeModName"){
+                        return false
+                    }
+                    return false
+                }
+                return true
+            }
+            return false
+        })
+        setInputStates(aux)
+        if(!aux.find((elem) => elem)){
+            setCubeInfo({...cubeInfo, cardText: `<div>${auxText}</div>`})
+            setAddCube(false)
+            setTimeout(() => {
+                addCubeMutation().then(() => {
+                    refetch()
+                })
+            }, 500)
+        }
+    }
     return (
-        <MainDiv>
+        <MainDivRe>
             <>
             {addCube &&
                 <InputWrapper>
                     <RowInput width="45%">
-                        <input type="text" placeholder="Cube Name" autoComplete="false" value={cubeInfo.cubeName} onChange={(e) => setCubeInfo({...cubeInfo, cubeName: e.target.value})}/>
-                        <input type="text" placeholder="Cube Dimensions" autoComplete="false" value={cubeInfo.cubeDimensions} onChange={(e) => setCubeInfo({...cubeInfo, cubeDimensions: e.target.value})}/>
+                        <Input width="45%" state={inputStates[0]} type="text" placeholder="Cube Name" autoComplete="false" value={cubeInfo.cubeName} onChange={(e) => setCubeInfo({...cubeInfo, cubeName: e.target.value})}/>
+                        <Input width="45%" state={inputStates[1]} type="text" placeholder="Cube Dimensions" autoComplete="false" value={cubeInfo.cubeDimensions} onChange={(e) => setCubeInfo({...cubeInfo, cubeDimensions: e.target.value})}/>
                     </RowInput>
                     <RowInputCheckbox>
-                        <div><input type="checkbox" placeholder="Cube Dimensions" autoComplete="false" checked={selectValue} onChange={(e) => setSelectValue(true)}/>Yes</div>
-                        <div><input type="checkbox" placeholder="Cube Dimensions" autoComplete="false"checked={!selectValue} onChange={(e) => setSelectValue(false)}/>No</div>
+                        <div><input type="checkbox" placeholder="Cube Dimensions" autoComplete="false" checked={selectValue} onChange={() => setSelectValue(true)}/>Yes</div>
+                        <div><input type="checkbox" placeholder="Cube Dimensions" autoComplete="false"checked={!selectValue} onChange={() => setSelectValue(false)}/>No</div>
                     </RowInputCheckbox>
                     {selectValue &&
-                        <input type="text" placeholder="Mod Name" autoComplete="false" value={cubeInfo.cubeModName} onChange={(e) => setCubeInfo({...cubeInfo, cubeModName: e.target.value})}/>
+                        <Input width="auto" state={inputStates[2]} type="text" placeholder="Mod Name" autoComplete="false" value={cubeInfo.cubeModName} onChange={(e) => setCubeInfo({...cubeInfo, cubeModName: e.target.value})}/>
                     }
                     <RowInput width="30%">
-                        <input type="text" placeholder="Cube Model" autoComplete="false" value={cubeInfo.cubeModel} onChange={(e) => setCubeInfo({...cubeInfo, cubeModel: e.target.value})}/>
-                        <input type="text" placeholder="Cube Brand" autoComplete="false" value={cubeInfo.cubeBrand} onChange={(e) => setCubeInfo({...cubeInfo, cubeBrand: e.target.value})}/>
-                        <input type="text" placeholder="Cube Designer" autoComplete="false" value={cubeInfo.cubeDesigner} onChange={(e) => setCubeInfo({...cubeInfo, cubeDesigner: e.target.value})}/>
+                        <Input width="30%" state={inputStates[selectValue ? 3 : 2]} type="text" placeholder="Cube Model" autoComplete="false" value={cubeInfo.cubeModel} onChange={(e) => setCubeInfo({...cubeInfo, cubeModel: e.target.value})}/>
+                        <Input width="30%" state={inputStates[selectValue ? 4 : 3]} type="text" placeholder="Cube Brand" autoComplete="false" value={cubeInfo.cubeBrand} onChange={(e) => setCubeInfo({...cubeInfo, cubeBrand: e.target.value})}/>
+                        <Input width="30%" state={inputStates[selectValue ? 5 : 4]} type="text" placeholder="Cube Designer" autoComplete="false" value={cubeInfo.cubeDesigner} onChange={(e) => setCubeInfo({...cubeInfo, cubeDesigner: e.target.value})}/>
                     </RowInput>
                     <RowInput width="45%">
-                        <input type="text" placeholder="Title" autoComplete="false" value={cubeInfo.cardMainTitle} onChange={(e) => setCubeInfo({...cubeInfo, cardMainTitle: e.target.value})}/>
-                        <input type="file" accept="image/*" onChange={(e) => setCubeInfo({...cubeInfo, cardImg: URL.createObjectURL(e.target.files![0])})} style={{borderBottom: "trasparent"}}/>
+                        <Input width="45%" state={inputStates[selectValue ? 6 : 5]} type="text" placeholder="Title" autoComplete="false" value={cubeInfo.cardMainTitle} onChange={(e) => setCubeInfo({...cubeInfo, cardMainTitle: e.target.value})}/>
+                        <Input width="45%" state={inputStates[selectValue ? 7 : 6]} type="file" accept="image/*" onChange={(e) => setCubeInfo({...cubeInfo, cardImg: URL.createObjectURL(e.target.files![0])})} style={{borderBottom: "trasparent"}}/>
                     </RowInput>
                     <TextArea setValue={setAuxText}/>
-                    <FinishButton onClick={(e) => {
-                        setCubeInfo({...cubeInfo, cardText: `<div>${auxText}</div>`})
-                        setAddCube(false)
-                        setTimeout(() => {
-                            addCubeMutation().then(() => {
-                                refetch()
-                            })
-                        }, 500)
-                    }}>Finish</FinishButton>
+                    <FinishButton onClick={onFinish}>Finish</FinishButton>
                 </InputWrapper>
             }
             {data && (data?.getCubesByUser.length!==0) &&  !addCube &&
                 <CubeWrapper>
                     {data.getCubesByUser.map((elem) => {
-                        return <SingleCubeCard onClick={(e) => [openModal(), setCubeInfo(elem)]}>
+                        return <SingleCubeCard onClick={() => [openModal(), setCubeInfo(elem)]}>
                             <strong>{elem.cardMainTitle}</strong>
                             <CardImg src={elem.cardImg} alt={`${elem.cubeName} img`}/>
                         </SingleCubeCard>
@@ -149,11 +166,14 @@ const MyCubes = (props: Props): JSX.Element => {
                 <span>{parse(cubeInfo.cardText)}</span>
             </Modal>
             <GoBackButton state={addCube} onClick={(e) => [setAddCube(!addCube), setCubeInfo(defaultCubeState)]}>
-                {!addCube && "Add New Cube"}
-                {addCube && "Go back"}
+                {!addCube ? 
+                    "Add New Cube"
+                    :
+                    "Go back" 
+                }
             </GoBackButton>
             </>
-        </MainDiv>
+        </MainDivRe>
     )
 }
 
@@ -161,8 +181,10 @@ export default MyCubes;
 //grid-template-column: repeat(5, 1fr);
 
 const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
-    display: flex;
-    flex-direction: row
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    grid-template-columns: repeat(3, 1fr);    
     width: 100%;
     height: 100%;
 `
@@ -193,6 +215,18 @@ const RowInput = styled.div<{width: string}>`
         &:focus {
             border-bottom: 3px solid #b31860ab
         }
+    }
+`
+const Input = styled.input<{state: boolean, width: string}>`
+    width: ${props => props.width};
+    height: 30px;
+    border: transparent;
+    background: transparent;
+    border-bottom: 3px solid ${props => props.state ? "red" : "#b31860"};
+    outline: none;
+    color: black;
+    &:focus {
+        border-bottom: 3px solid ${props => props.state ? "red" : "#b31860ab"};
     }
 `
 const RowInputCheckbox = styled.div`
