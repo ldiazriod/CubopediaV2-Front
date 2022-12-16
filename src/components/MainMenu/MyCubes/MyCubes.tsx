@@ -45,12 +45,18 @@ const GET_USER_CUBES = gql`
             cardText,
             cardImg,       
             cardReviewPoints,
+            public
         }
     }
 `
 const ADD_CARD_CUBE = gql`
     mutation addCubeCard($info: CubeInput!){
         addCubeCard(info: $info)
+    }
+`
+const MAKE_PUBLIC = gql`
+    mutation makePublic($id: ID!){
+        makePublic(id: $id)
     }
 `
 
@@ -78,6 +84,11 @@ const MyCubes = (props: Props): JSX.Element => {
     const [auxText, setAuxText] = useState<string>("")
     const [inputStates, setInputStates] = useState<boolean[]>([])
     const [cubeInfo, setCubeInfo] = useState<PersonalCubeInfo>({...defaultCubeState, creator: props.creator})
+    const [makePublicMutation] = useMutation(MAKE_PUBLIC, {
+        variables: {
+            id: cubeInfo._id
+        }
+    })
     const [addCubeMutation] = useMutation(ADD_CARD_CUBE, {
         variables: {
             info: cubeInfo
@@ -164,6 +175,9 @@ const MyCubes = (props: Props): JSX.Element => {
             >
                 <strong>{cubeInfo.cardMainTitle}</strong>
                 <span>{parse(cubeInfo.cardText)}</span>
+                <button onClick={() => {makePublicMutation()
+                    console.log({...cubeInfo, public: false})
+                }}>{cubeInfo.public ? "Update" : "Upload"}</button>
             </Modal>
             <GoBackButton state={addCube} onClick={(e) => [setAddCube(!addCube), setCubeInfo(defaultCubeState)]}>
                 {!addCube ? 
