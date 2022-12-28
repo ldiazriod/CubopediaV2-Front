@@ -4,10 +4,11 @@ import styled from "styled-components";
 
 type Props = {
     setValue:  React.Dispatch<React.SetStateAction<string>>
+    oldValue?: string
 }
 
 const TextArea = (props: Props) => {
-    const [textEvent, setTextEvent] = useState<{text: string, e: React.ChangeEvent<HTMLTextAreaElement> | undefined}>({text: "", e: undefined});
+    const [textEvent, setTextEvent] = useState<{text: string, e: React.ChangeEvent<HTMLTextAreaElement> | undefined}>({text: props.oldValue ? props.oldValue : "", e: undefined});
     const [textModifier, setTextModifier] = useState<boolean[]>([false, false, false])
     const setModifierValues = (index: number) => {
         setTextModifier(textModifier.map((elem, i) => {
@@ -16,7 +17,7 @@ const TextArea = (props: Props) => {
     }
     return(
         <Wrapper>
-            <TextAreaStyle value={textEvent.text} onChange={(e) =>[setTextEvent({text: e.target.value, e: e}), props.setValue(textEvent.text.toString())]}/>
+            <TextAreaStyle value={textEvent.text} onChange={(e) =>[setTextEvent({text: e.target.value, e: e}), props.setValue(textEvent.text.toString())]} onBlur={(e) =>[setTextEvent({text: e.target.value, e: e}), props.setValue(textEvent.text.toString())]}/>
             <ButtonWrapper>
                 <Button state={textModifier[0]} onClick={(e) => {
                     setTextEvent({text: textEvent.text + (textModifier[0] ? "</strong>" : "<strong>"), e: (textEvent.e ? textEvent.e : undefined)})

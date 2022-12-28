@@ -25,7 +25,7 @@ const MainMenu = (props: Props): JSX.Element => {
                 {menu[0] ? 
                     <MyCubes authToken={props.authToken} creator={props.userId}/>
                     :
-                    menu[1] ? <PublicCubes creator={props.userId}/> : <Profile/>
+                    menu[1] ? <PublicCubes creator={props.userId} authToken={props.authToken}/> : <Profile/>
                 }
             </RightDiv>
         </CustomMain>
