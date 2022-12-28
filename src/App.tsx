@@ -13,7 +13,9 @@ import MainMenu from './components/MainMenu/MainMenu';
 
 const client = new ApolloClient({
   uri: process.env.REACT_APP_API_URL,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    addTypename: false
+  }),
 });
 
 function App() {
