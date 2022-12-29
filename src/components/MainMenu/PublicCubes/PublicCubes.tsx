@@ -9,6 +9,7 @@ import TextArea from "../../others/TextArea";
 
 type Props = {
     creator: string
+    authToken: string
 }
 
 type SearchValues = {
@@ -16,11 +17,15 @@ type SearchValues = {
     cubeDimensions?: string | undefined,
     cubeName?: string | undefined,
     cardReviewPoints?: number | undefined
+    cubeType?: boolean | undefined
 }
 
 type CubeInfo = {
     _id?: string
-    creator: string,
+    creator: {
+        creatorId: string,
+        username: string,
+    },
     cubeName: string,
     cubeDimensions: string,
     cubeModName?: string,
@@ -34,8 +39,11 @@ type CubeInfo = {
     public?: boolean
 }
 
-const defaultCubeState = {
-    creator: "",
+const defaultCubeState: CubeInfo = {
+    creator: {
+        creatorId: "",
+        username: ""
+    },
     cubeName: "",
     cubeDimensions: "",
     cardMainTitle: "",
@@ -49,7 +57,10 @@ const SEARCH_PUBLIC_CUBES = gql`
     query getPublicCubes($page: Int!, $search: PublicSearch){
         getPublicCubes(page: $page, search: $search){
             _id,
-            creator,
+            creator {
+                creatorId,
+                username
+            },
             cubeName,
             cubeDimensions,
             cubeModName,
@@ -63,18 +74,32 @@ const SEARCH_PUBLIC_CUBES = gql`
         }
     }
 `
+const CLONE_CUBE = gql`
+    mutation cloneCube($input: CloneInfo!){
+        cloneCube(input: $input)
+    }
+`
 const PublicCubes = (props: Props): JSX.Element => {
     const [searchValues, setSeachValues] = useState<SearchValues>()
     const [page, setPage] = useState<number>(1)
     const [modal, setModal] = useState<boolean>(false)
-    const [cubeInfo, setCubeInfo] = useState<CubeInfo>({...defaultCubeState, creator: props.creator})
+    const [cubeInfo, setCubeInfo] = useState<CubeInfo>({...defaultCubeState, creator: {creatorId: props.creator, username: ""}})
     const {data, error, loading, refetch} = useQuery<{getPublicCubes: CubeInfo[]}>(SEARCH_PUBLIC_CUBES, {
         variables: {
             page: page,
             search: searchValues
         }
     })
-
+    const [cloneCube] = useMutation(CLONE_CUBE, {
+        variables: {
+            input: {
+                id: cubeInfo._id,
+                authToken: props.authToken
+            }
+        }
+    })
+    const starOptions: number[] = [0,1,2,3,4,5]
+    const typeOptions: string[] = ["Normal", "Modded"]
     const openModal = () => {
         setModal(true)
     }
@@ -89,11 +114,9 @@ const PublicCubes = (props: Props): JSX.Element => {
     if(error){
         return <div>{`Error: ${error}`}</div>
     }
-    if(loading){
-        return <div>Loading...</div>
-    }
+
     return (
-        <div>
+        <MainDivRe>
             <Modal
                 isOpen={modal}
                 onRequestClose={closeModal}
@@ -101,31 +124,46 @@ const PublicCubes = (props: Props): JSX.Element => {
             >
                 <strong>{cubeInfo.cardMainTitle}</strong>
                 <span>{parse(cubeInfo.cardText)}</span>
-                {props.creator !== cubeInfo.creator && 
-                    <button>Clone</button>
+                {props.creator !== cubeInfo.creator.creatorId && 
+                    <button onClick={() => cloneCube()}>Clone</button>
                 }
             </Modal>
-            <input type="text" placeholder="Title" value={searchValues?.cardMainTitle} onChange={(e) => setSeachValues(searchValues ? {...searchValues, cardMainTitle: e.target.value} : {cardMainTitle: e.target.value})}/>
-            <select name="dropdown" id="dropdown" onChange={(e) => setSeachValues(searchValues ? {...searchValues, cardReviewPoints: Number(e.target.value)} : {cardReviewPoints: Number(e.target.value)})}>
-                <option value={5}>5 points</option>
-                <option value={4}>4 points</option>
-                <option value={3}>3 points</option>
-                <option value={2}>2 points</option>
-                <option value={1}>1 points</option>
-                <option value={0}>0 points</option>
-            </select>
+            <InputDisplay>
+                <Input type="text" placeholder="Title" value={searchValues?.cardMainTitle} onChange={(e) => setSeachValues(searchValues ? {...searchValues, cardMainTitle: e.target.value} : {cardMainTitle: e.target.value})}/>
+                <Select onChange={(e) => setSeachValues(searchValues ? {...searchValues, cardReviewPoints: Number(e.target.value)} : {cardReviewPoints: Number(e.target.value)})} value={searchValues ? searchValues.cardReviewPoints : starOptions[0]}>
+                    {starOptions.map((elem) => {
+                        return <option key={elem} value={elem}>
+                            {`${elem} stars`}
+                        </option>
+                    })}
+                </Select>
+                <Select onChange={(e) => setSeachValues(searchValues ? {
+                        ...searchValues, cubeType: e.target.value === "Normal" ? false : true
+                    } : {
+                        cubeType: e.target.value === "Normal" ? false : true})
+                    } value={searchValues ? (searchValues.cubeType === false ? "Normal" : "Modded") : "Normal"}
+                >
+                    {typeOptions.map((elem, i) => {
+                        return <option key={i*20} value={elem}>
+                            {elem}
+                        </option>
+                    })}
+                </Select>
+            </InputDisplay>
             <CubeWrapper>
                 {data && data.getPublicCubes.map((elem) => {
-                    return <SingleCubeCard onClick={() => [setCubeInfo(elem), openModal()]}>
+                    return <SingleCubeCard>
                         <strong>{elem.cardMainTitle}</strong>
-                        <CreatorButton>{elem.creator}</CreatorButton>
-                        <CardImg src={elem.cardImg} alt={`${elem.cubeName} img`}/>
+                        <CreatorButton>{elem.creator.username}</CreatorButton>
+                        <div onClick={() => [setCubeInfo(elem), openModal()]} style={{width: "100%"}}>
+                            <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`}/>
+                        </div>
                     </SingleCubeCard>
                 })}
             </CubeWrapper>
             {page > 1 && <button onClick={() => setPage(page-1)}>Prev</button>}
-            <button onClick={() => setPage(page+1)}>Next</button>
-        </div>
+            <FinishButton onClick={() => setPage(page+1)}>Next</FinishButton>
+        </MainDivRe>
     )
 }
 
@@ -137,19 +175,24 @@ const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
     justify-items: center;
     grid-template-columns: repeat(3, 1fr);    
     width: 100%;
-    height: 100%;
+    height: fit-content;
 `
 const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 300px;
-    height: auto;
+    height: fit-content;
     background: white;
     box-shadow: 0px 5px 5px #97949496;
     border-radius: 8px;
     padding: 10px;
-    margin: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+`
+const InputDisplay = styled.div`
+    display: flex;
+    align-items: center;
 `
 const CardImg: StyledComponent<"img", any, {}, never> = styled.img`
     width: 90%;
@@ -159,6 +202,7 @@ const CreatorButton = styled.button`
     background: transparent;
     border: transparent;
     border-bottom: 1px solid black;
+    margin-bottom: 10px;
 `
 const FinishButton = styled.button`
     background: #b31860;
@@ -172,12 +216,28 @@ const FinishButton = styled.button`
     border-radius: 8px;
     font-size: 16px;
     font-weight: 700;
-    transition: 0.45s;
-    &:hover {
-        border: 2px solid #b31860;
-        color: #b31860;
-        background: white;
+`
+const Input = styled.input`
+    border: 1px solid transparent;
+    width: 300px;
+    margin: 10px;
+    padding: 15px;
+    box-shadow: 0px 5px 5px #97949496;
+    border-radius: 8px;
+    font-size: 16px;
+    &:focus{
+        outline: none;
     }
+`
+const Select = styled.select`
+    border: 1px solid transparent;
+    box-shadow: 0px 5px 5px #97949496;
+    border-radius: 8px;
+    width: 100px;
+    height: 50px;
+    margin-left: 20px;
+    text-align: center;
+    font-size: 16px;
 `
 const GoBackButton = styled.button<{state: boolean}>`
     background: ${props => props.state ? "white" : "#b31860"};

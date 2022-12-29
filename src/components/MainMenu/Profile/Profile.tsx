@@ -27,10 +27,27 @@ const Profile = (): JSX.Element => {
     }
 
     return (
-        <div>
+        <MainDivRe>
             <button onClick={onLogOut}>Log out</button>
-        </div>
+            <ProfileStats>
+                
+            </ProfileStats>
+        </MainDivRe>
     )
 }
 
 export default Profile
+
+const ProfileStats = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`
+const ProfileImg = styled.div`
+
+`
+const StatRow = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+`
