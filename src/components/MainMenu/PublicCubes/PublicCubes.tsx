@@ -106,7 +106,6 @@ const PublicCubes = (props: Props): JSX.Element => {
                 }
             </Modal>
             <input type="text" placeholder="Title" value={searchValues?.cardMainTitle} onChange={(e) => setSeachValues(searchValues ? {...searchValues, cardMainTitle: e.target.value} : {cardMainTitle: e.target.value})}/>
-            <label htmlFor="dropdown">Select points:</label>
             <select name="dropdown" id="dropdown" onChange={(e) => setSeachValues(searchValues ? {...searchValues, cardReviewPoints: Number(e.target.value)} : {cardReviewPoints: Number(e.target.value)})}>
                 <option value={5}>5 points</option>
                 <option value={4}>4 points</option>
