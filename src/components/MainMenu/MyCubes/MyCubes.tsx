@@ -31,7 +31,10 @@ type PersonalCubeInfo = {
     cardMainTitle: string
     cardText: string
     cardImg: string
-    cardReviewPoints: number
+    cardReviewPoints: {
+        reviewMean: number,
+        reviews: string[]
+    }
     public: boolean
 }
 
@@ -52,7 +55,10 @@ const GET_USER_CUBES = gql`
             cardMainTitle,
             cardText,
             cardImg,       
-            cardReviewPoints,
+            cardReviewPoints{
+                reviewMean,
+                reviews
+            },
             public
         }
     }
@@ -77,7 +83,6 @@ const UPDATE_CUBE = gql`
         changeCube(input: $input)
     }
 `
-
 const defaultCubeState: PersonalCubeInfo = {
     creator: {
         creatorId: "",
@@ -87,7 +92,10 @@ const defaultCubeState: PersonalCubeInfo = {
     cubeDimensions: "",
     cardMainTitle: "",
     cardText: "",
-    cardReviewPoints: 0,
+    cardReviewPoints: {
+        reviewMean: 0,
+        reviews: []
+    },
     cardImg: "",
     public: false
 }
@@ -136,7 +144,6 @@ const MyCubes = (props: Props): JSX.Element => {
         setModal(true)
     }
     const closeModal = () => {
-        //setCubeInfo(defaultCubeState)
         setModal(false)
     }
 
@@ -240,8 +247,8 @@ const MyCubes = (props: Props): JSX.Element => {
                 }
                 {data && (data?.getCubesByUser.length!==0) &&  !addCube &&
                     <CubeWrapper>
-                        {data.getCubesByUser.map((elem) => {
-                            return <SingleCubeCard onClick={() => [openModal(), setCubeInfo(elem)]}>
+                        {data.getCubesByUser.map((elem, i) => {
+                            return <SingleCubeCard onClick={() => [openModal(), setCubeInfo(elem)]} key={i}>
                                 <strong style={{marginBottom: "15px", fontSize: "17px"}}>{elem.cardMainTitle}</strong>
                                 <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`}/>
                             </SingleCubeCard>
@@ -283,7 +290,6 @@ const MyCubes = (props: Props): JSX.Element => {
 }
 
 export default MyCubes;
-//grid-template-column: repeat(5, 1fr);
 
 const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
     display: grid;
@@ -326,6 +332,7 @@ const DeleteButton = styled.button`
     border-radius: 8px;
     font-size: 14px;
     font-weight: 700;
+    cursor: pointer;
 `
 const UploadButton = styled.button`
     display: flex;
@@ -341,6 +348,7 @@ const UploadButton = styled.button`
     border-radius: 8px;
     font-size: 15px;
     font-weight: 700;
+    cursor: pointer;
 `
 const DivOverlay = styled.div<{state: boolean}>`
     position: fixed;
@@ -439,11 +447,13 @@ const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
     border-radius: 8px;
     padding: 10px;
     margin: 20px;
+    cursor: pointer;
 `
 const CardImg: StyledComponent<"img", any, {}, never> = styled.img`
     width: 95%;
     height: 200px;
     border-radius: 8px;
+    cursor: pointer;
 `
 const FinishButton = styled.button`
     background: #b31860;
@@ -457,6 +467,7 @@ const FinishButton = styled.button`
     font-size: 16px;
     font-weight: 700;
     transition: 0.45s;
+    cursor: pointer;
     &:hover {
         border: 2px solid #b31860;
         color: #b31860;
@@ -476,6 +487,7 @@ const GoBackButton = styled.button<{state: boolean}>`
     font-size: 16px;
     font-weight: 700;
     transition: 0.45s;
+    cursor: pointer;
     &:hover {
         border: 2px solid #b31860;
         color: ${props => props.state ? "white" : "#b31860"};
