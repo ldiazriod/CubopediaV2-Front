@@ -14,7 +14,7 @@ const ADD_REVIEW = gql`
     }
 `
 const ReviewStars = (props: Props) => {
-    const [starValue, setStarValue] = useState<number>(props.starValue === 0 ? -1 : props.starValue)
+    const [starValue, setStarValue] = useState<number>(props.starValue)
     const [editable, setEditable] = useState<boolean>(props.editable)
     const [addReview] = useMutation(ADD_REVIEW)
     return (
@@ -23,7 +23,7 @@ const ReviewStars = (props: Props) => {
                 return <Button index={i} value={starValue} onClick={() =>{
                     if(editable){
                         setStarValue(i)
-                        addReview({variables: {input: {userId: props.userId, cubeId: props.cubeId, points: i}}})
+                        addReview({variables: {input: {userId: props.userId, cubeId: props.cubeId, points: i+1}}})
                         setEditable(false)
                     }
                 }}>
