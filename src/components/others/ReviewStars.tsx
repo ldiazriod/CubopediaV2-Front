@@ -1,12 +1,38 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { ApolloQueryResult, gql, OperationVariables, useMutation, useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import styled from "styled-components";
+
+type CubeInfo = {
+    _id?: string
+    creator: {
+        creatorId: string,
+        username: string,
+    },
+    cubeName: string,
+    cubeDimensions: string,
+    cubeModName?: string,
+    cubeModel?: string,
+    cubeBrand?: string
+    cubeDesigner?: string
+    cardMainTitle: string
+    cardText: string
+    cardImg: string
+    cardReviewPoints: {
+        reviewMean: number,
+        reviews: string[]
+    }    
+    public?: boolean
+}
 
 type Props = {
     starValue: number,
     editable: boolean,
     cubeId?: string,
     userId?: string
+    closeModal?: () => void
+    refetch?: (variables?: Partial<OperationVariables> | undefined) => Promise<ApolloQueryResult<{
+        getPublicCubes: CubeInfo[];
+    }>>
 }
 const ADD_REVIEW = gql`
     mutation addReview($input: ReviewInput!){
@@ -24,6 +50,12 @@ const ReviewStars = (props: Props) => {
                     if(editable){
                         setStarValue(i)
                         addReview({variables: {input: {userId: props.userId, cubeId: props.cubeId, points: i+1}}})
+                        if(props.closeModal){
+                            props.closeModal()
+                        }
+                        if(props.refetch){
+                            props.refetch()
+                        }
                         setEditable(false)
                     }
                 }}>

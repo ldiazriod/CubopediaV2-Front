@@ -1,8 +1,7 @@
-import React, {useState, useEffect, useRef} from "react";
-import styled, { StyledComponent } from "styled-components"
+import React, {useState, useRef} from "react";
+import styled from "styled-components"
 import { DocumentNode, gql, useMutation } from "@apollo/client";
 import axios from "axios"
-import ReCAPTCHA from "react-google-recaptcha";
 
 import {MainDiv} from "../../styles/globalStyles";
 import MainMenu from "../MainMenu/MainMenu";
@@ -53,7 +52,8 @@ const ADD_USER: DocumentNode = gql`
     }
 `
 const SignUp = (): JSX.Element => {
-    const captchaRef = useRef(null)
+    const captchaRef = useRef<any>()
+    const [captchaToken, setCaptchaToken] = useState(null);
     const [userInfo, setUserInfo] = useState<UserInfo>(initialUserInfo)
     const [alerts, setAlerts] = useState<AlertsType>(initialAlerts)
     const [next, setNext] = useState<boolean>(false);
@@ -92,6 +92,11 @@ const SignUp = (): JSX.Element => {
         }
     }
 
+    const verify = () => {
+        captchaRef.current.getResponse().then((response: any)=>{
+            setCaptchaToken(response)
+        })
+    }
     return(
         <MainDiv>
             {!finish ? <MainWrapper>
@@ -123,11 +128,7 @@ const SignUp = (): JSX.Element => {
                                 <Input type="text" placeholder="Name" autoComplete="false" value={userInfo.name} onChange={(e) =>setUserInfo({...userInfo, name: e.target.value})}/>
                                 <Input type="text" placeholder="Last name" autoComplete="false" value={userInfo.lastname} onChange={(e) => setUserInfo({...userInfo, lastname: e.target.value})}/>
                             </InputContainer>
-                            <Button onClick={onClickFinish}>Finish</Button>
-                            <ReCAPTCHA
-                                sitekey={process.env.REACT_APP_SITE_KEY!}
-                                ref={captchaRef}
-                            />
+                            <Button onClick={onClickFinish} disabled={captchaToken === null ? true : false}>Finish</Button>
                         </>
                     }
                 </MainWrapper>

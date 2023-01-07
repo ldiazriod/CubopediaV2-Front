@@ -144,7 +144,6 @@ const PublicCubes = (props: Props): JSX.Element => {
 
 
     if(toProfile.profile){
-        //GoBackButton
         return (
             <>
                 <GoBackButton onClick={() => setToProfile({profile: false, creator: ""})}>Go Back</GoBackButton>
@@ -175,7 +174,7 @@ const PublicCubes = (props: Props): JSX.Element => {
                                     <ReviewStars starValue={responseGetReview.data.getReview.reviewValue-1} editable={!responseGetReview.data.getReview.reviewed}/>
                                 </div> : <div>
                                     Add review
-                                    <ReviewStars starValue={responseGetReview.data.getReview.reviewValue-1} editable={!responseGetReview.data.getReview.reviewed} cubeId={cubeInfo._id} userId={props.creator}/>
+                                    <ReviewStars starValue={responseGetReview.data.getReview.reviewValue-1} editable={!responseGetReview.data.getReview.reviewed} cubeId={cubeInfo._id} userId={props.creator} closeModal={closeModal} refetch={refetch}/>
                                 </div>
                                 }
                             </>
