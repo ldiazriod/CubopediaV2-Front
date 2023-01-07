@@ -73,7 +73,7 @@ const SignUp = (): JSX.Element => {
 
     const onClickNext = async() => {
         if(userInfo.email.length !== 0 && userInfo.username.length !== 0 && userInfo.password.length !== 0){
-            const strongPassword = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+            const strongPassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/
             const aux = strongPassword.test(userInfo.password)
             if(aux){
                 const goodMail = (await axios.get<EmailValidation>(process.env.REACT_APP_EMAIL_API_URL!)).data
