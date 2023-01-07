@@ -235,7 +235,7 @@ const Profile = (props: Props): JSX.Element => {
                                 </ProfileImgContainer>
                                 <div>{data.getProfileInfo.username}</div>
                                 <ReviewContainer>
-                                    <ReviewStars starValue={data.getProfileInfo.cardReviews.cardsTotalMean} editable={false}/>
+                                    <ReviewStars starValue={data.getProfileInfo.cardReviews.cardsTotalMean-1} editable={false}/>
                                     <div>{`(${data.getProfileInfo.cardReviews.cardsTotalReviews})`}</div>
                                 </ReviewContainer>
                                 <input style={{display: "none"}} id="file-upload" type="file" onChange={onNewImage}/>
