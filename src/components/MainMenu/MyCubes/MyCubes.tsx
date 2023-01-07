@@ -8,6 +8,7 @@ import parse from "html-react-parser";
 import {MainDivRe} from "../../../styles/globalStyles";
 import TextArea from "../../others/TextArea";
 import "./modal.css"
+import Loader from "../../others/Loader";
 
 Modal.setAppElement("body")
 
@@ -116,7 +117,7 @@ const MyCubes = (props: Props): JSX.Element => {
     const [loadingCard, setLoadingCard] = useState<boolean>(false)
     const [changeCube] = useMutation(UPDATE_CUBE, {
         variables: {
-            input: {...cubeInfo, cardText: auxText}
+            input: {...cubeInfo, cardText: auxText, cardReviewPoints: 0}
         }
     })
     const [deleteCube] = useMutation(DELETE_CUBE, {
@@ -134,7 +135,7 @@ const MyCubes = (props: Props): JSX.Element => {
     })
     const [addCubeMutation] = useMutation(ADD_CARD_CUBE, {
         variables: {
-            info: {...cubeInfo, creator: props.creator}
+            info: {...cubeInfo, creator: props.creator, cardReviewPoints: 0}
         },
         refetchQueries: [
             {query: GET_USER_CUBES}
@@ -147,9 +148,13 @@ const MyCubes = (props: Props): JSX.Element => {
         setModal(false)
     }
 
+    useEffect(()=> {
+        refetch()
+    },[])
+
     const onFinish = async() => {
         setLoadingCard(true)
-        let auxCube = {...cubeInfo, CardText: auxText}
+        let auxCube = {...cubeInfo, cardText: auxText}
         const newFileForm = new FormData()
         if(cubeInfo.cardImg.length === 0){
             const imgElement: HTMLInputElement = document.getElementById("imgInput") as HTMLInputElement;
@@ -159,6 +164,7 @@ const MyCubes = (props: Props): JSX.Element => {
                 const blob = file.slice(0, file.size, file.type)
                 newFileForm.append("upload", blob, newName)
                 auxCube={...auxCube, cardImg: newName, cardText: `<div>${auxText} </div>`}
+                console.log(auxCube)
             }
         }
         setCubeInfo(auxCube)
@@ -188,8 +194,10 @@ const MyCubes = (props: Props): JSX.Element => {
         })
         if(!aux.find((elem) => elem)){
             if(cubeInfo.cardImg.length === 0 && !cubeInfo._id){
-                await axios.post(`${process.env.REACT_APP_IMG_API_URL}/upload`, newFileForm)
-                await addCubeMutation().then(() => refetch())
+                await addCubeMutation({variables: {info: {...auxCube, creator: props.creator, cardReviewPoints: 0}}}).then(async() => {
+                    await axios.post(`${process.env.REACT_APP_IMG_API_URL}/upload`, newFileForm)
+                    refetch()
+                })
             }else{
                 await changeCube().then(() => refetch())
             }
@@ -197,19 +205,13 @@ const MyCubes = (props: Props): JSX.Element => {
             setAddCube(false)
         }
     }
-    if(loading){
-        return <div>Loading...</div>
-    }
     if(error){
         return <div>{`${error}`}</div>
     }
-
     return (
         <MainDivRe>
             <>
-                <DivOverlay state={loadingCard}>
-                    <Loader/>
-                </DivOverlay>
+                <Loader loading={loadingCard || loading}/>
                 <GoBackButton state={addCube} onClick={() => [setAddCube(!addCube), setCubeInfo(defaultCubeState)]}>
                     {!addCube ? "Add New Cube" : "Go back" }
                 </GoBackButton>
@@ -270,7 +272,10 @@ const MyCubes = (props: Props): JSX.Element => {
                                 {cubeInfo.public ? 
                                     <UploadButton onClick={() => [setAddCube(true), closeModal()]}>Update</UploadButton>
                                     :
-                                    <UploadButton onClick={() => makePublicMutation()}>Upload</UploadButton>
+                                    <UploadButton onClick={() => {
+                                        makePublicMutation().then(() => refetch())
+                                        closeModal()
+                                    }}>Upload</UploadButton>
                                 }
                                 <DeleteButton onClick={() => {
                                     deleteCube().then(() => {
@@ -349,51 +354,6 @@ const UploadButton = styled.button`
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-`
-const DivOverlay = styled.div<{state: boolean}>`
-    position: fixed;
-    display: ${props => props.state ? "block" : "none"};
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 2;
-    cursor: pointer; 
-`
-const Loader = styled.span`
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    position: relative;
-    top: 50%;
-    ::before, ::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: #642ea2;
-        animation: slide 1s infinite linear alternate;
-        opacity: 0.5;
-    }
-    ::after {
-        background:#b31860;
-        animation: slide2 1s infinite linear alternate;
-        opacity: 1;
-    }
-    @keyframes slide {
-        0% , 20% {  transform: translate(0, 0)  }
-        80% , 100% { transform: translate(15px, 15px) }
-    }
-    @keyframes slide2 {
-        0% , 20% {  transform: translate(0, 0) }
-        80% , 100% { transform: translate(-15px, -15px) }
-    }
 `
 
 const RowInput = styled.div<{width: string}>`
