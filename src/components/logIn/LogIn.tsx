@@ -48,10 +48,12 @@ const LogIn = (props: Props): JSX.Element => {
             if(!response.data){
                 setNotUser(true)
             }else{
-                dispatch(logIn({authToken: response.data.logIn.authToken, creator: response.data.logIn.creator}))
-                setNotUser(false)
-                setLog(true)
-                props.setSelector(false)
+                if(response.data.logIn.authToken){
+                    dispatch(logIn({authToken: response.data.logIn.authToken, creator: response.data.logIn.creator}))
+                    setNotUser(false)
+                    setLog(true)
+                    props.setSelector(false)
+                }
             }
         })
     }
