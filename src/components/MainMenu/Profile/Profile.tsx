@@ -16,10 +16,11 @@ import defaultProfile from "../../../assets/defaultPicture.jpg"
 import penIcon from "../../../assets/penIcon.png"
 import "./modalP.css"
 import ReviewStars from "../../others/ReviewStars";
+import Loader from "../../others/Loader";
 
 type Props = {
     creator: string;
-    authToken: string
+    authToken?: string
 }
 type ProfileCube = {
     _id: string
@@ -150,7 +151,7 @@ const Profile = (props: Props): JSX.Element => {
     })
     const [logOutMutation] = useMutation(SET_LOGOUT, {
         variables: {
-            input: props.authToken
+            authToken: props.authToken
         }
     })
     const [cloneCube] = useMutation(CLONE_CUBE, {
@@ -200,15 +201,12 @@ const Profile = (props: Props): JSX.Element => {
         })
         refetch()
     }
-
-    if(loading){
-        return <div>Loading...</div>
-    }
     if(error){
         return <div>{`${error}`}</div>
     }
     return (
         <MainDivRe>
+            <Loader loading={loading}/>
             <Modal
                 isOpen={modal}
                 onRequestClose={closeModal}
@@ -216,9 +214,11 @@ const Profile = (props: Props): JSX.Element => {
                 className="ModalP"
                 overlayClassName="Overlay"
             >
-                <strong>{cubeInfo.cardMainTitle}</strong>
-                <span>{parse(cubeInfo.cardText)}</span>
-                {props.creator && <button onClick={() => cloneCube()}>Clone</button>}
+                <ModalWrapper>
+                    <CardTitle>{cubeInfo.cardMainTitle}</CardTitle>
+                    <CardText>{parse(cubeInfo.cardText)}</CardText>
+                    {!isUser.data?.isUser && <button onClick={() => [cloneCube(), closeModal()]}>Clone</button>}
+                </ModalWrapper>
             </Modal>
             {data && isUser.data &&
                 <> 
@@ -247,8 +247,8 @@ const Profile = (props: Props): JSX.Element => {
                             </>
                         }
                         <StatRow>
-                            <div>Num Cubes: {data.getProfileInfo.cubes.length}</div>
-                            <div>Points: {`Finish`}</div>
+                            <div>{`Num Cubes: ${data.getProfileInfo.cubes.length}`}</div>
+                            <div>{`Num reviews: ${data.getProfileInfo.numReviews}`}</div>
                         </StatRow>
                         <StatRow>
 
@@ -266,12 +266,12 @@ const Profile = (props: Props): JSX.Element => {
                     </CubeWrapper>
                     {isUser.data.isUser && 
                         <>
-                            <button onClick={onLogOut}>Log out</button>
-                            <button>Delete User</button>
+                            <FinishButton onClick={onLogOut}>Log out</FinishButton>
+                            <DeleteButton onClick={() => setDeleteUserS({delete: true, password: ""})}>Delete User</DeleteButton>
                             {deleteUserS.delete && 
                                 <>
-                                    <input type="password" value={deleteUserS.password} onChange={(e) => setDeleteUserS({...deleteUserS, password: e.target.value})}/>
-                                    <button onClick={onDelete}>Confirm</button>
+                                    <Input type="password" placeholder="Add Password" value={deleteUserS.password} onChange={(e) => setDeleteUserS({...deleteUserS, password: e.target.value})}/>
+                                    <DeleteButton onClick={onDelete}>Confirm</DeleteButton>
                                 </>
                             }
                         </>
@@ -292,6 +292,7 @@ const ProfileStats = styled.div`
 const PublicProfileImg = styled.img`
     border-radius: 50%;
     height: 100px;
+    width: 100px;
     border: 5px solid black;
 `
 const ProfileMiddle = styled.div`
@@ -308,10 +309,51 @@ const ProfileOverlayImg = styled.img`
 const ProfileImg = styled.img`
     border-radius: 50%;
     height: 100px;
+    width: 100px;
     opacity: 1;
     display: block;
     transition: .5s ease;
     backface-visibility: hidden;
+`
+const Input = styled.input`
+    border: 1px solid transparent;
+    width: 300px;
+    margin: 10px;
+    padding: 15px;
+    box-shadow: 0px 5px 5px #97949496;
+    border-radius: 8px;
+    font-size: 16px;
+    &:focus{
+        outline: none;
+    }
+`
+const DeleteButton = styled.button`
+    background: red;
+    border: 1px solid red;
+    color: white;
+    width: 110px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 5px 10px 5px 10px;
+    box-shadow: 0px 5px 5px #97949496;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+`
+const FinishButton = styled.button`
+    background: #b31860;
+    border: 2px solid #b31860;
+    color: white;
+    width: 20%;
+    padding: 10px 25px 10px 25px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 5px 5px #97949496;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
 `
 const ProfileImgContainer = styled.div`
     position: relative;
@@ -326,10 +368,30 @@ const ProfileImgContainer = styled.div`
         opacity: 0.3;
     }
 `
+const ModalWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+`
+const CardTitle = styled.strong`
+    font-size: 25px;
+    margin-bottom: 10px;
+`
+const CardText = styled.span`
+    height: 90%;
+    min-height: 90%;
+`
 const StatRow = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    width: 100%;
+    div {
+        margin-left: 10px;
+        margin-right: 10px;
+        font-size: 16px;
+    }
 `
 const ReviewContainer = styled.div`
     display: flex;
