@@ -29,7 +29,7 @@ const LogIn = (props: Props): JSX.Element => {
     const [log, setLog] = useState<boolean>(false)
     const [logInM, {data, error, loading}] = useMutation(LOG_IN, {
         variables: {
-            email: "",
+            email: nameEmail,
             username: nameEmail,
             password: password
         }

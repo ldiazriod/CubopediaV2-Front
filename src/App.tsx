@@ -36,10 +36,14 @@ function App() {
                 <Img src={mainLogo}/>
               </MainContainer>
             :
-              logIn ?
+            <>
+              <GoBackButton onClick={() => setSelector(false)}>Go back</GoBackButton>
+              {logIn ?
                 <LogIn setSelector={setSelector}/>
                 :
                 <SignUp/>
+              }
+            </>
           :  <MainMenu authToken={user.user.authToken} userId={user.user.creator}/>
           }
         </div>
@@ -63,6 +67,26 @@ const ButtonsContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+`
+const GoBackButton = styled.button`
+    background: white;
+    border: 2px solid #b31860;
+    color: #b31860;
+    width: 20%;
+    padding: 10px 25px 10px 25px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 5px 5px #97949496;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    transition: 0.45s;
+    cursor: pointer;
+    &:hover {
+        border: 2px solid #b31860;
+        color:#b31860;
+        background: white;
+    }
 `
 const Button = styled.button`
     width: 330px;
