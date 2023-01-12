@@ -217,7 +217,7 @@ const Profile = (props: Props): JSX.Element => {
                 <ModalWrapper>
                     <CardTitle>{cubeInfo.cardMainTitle}</CardTitle>
                     <CardText>{parse(cubeInfo.cardText)}</CardText>
-                    {!isUser.data?.isUser && <button onClick={() => [cloneCube(), closeModal()]}>Clone</button>}
+                    {!isUser.data?.isUser && <FinishButton onClick={() => [cloneCube(), closeModal()]}>Clone</FinishButton>}
                 </ModalWrapper>
             </Modal>
             {data && isUser.data &&
@@ -234,10 +234,6 @@ const Profile = (props: Props): JSX.Element => {
                                     </ProfileMiddle>
                                 </ProfileImgContainer>
                                 <div>{data.getProfileInfo.username}</div>
-                                <ReviewContainer>
-                                    <ReviewStars starValue={data.getProfileInfo.cardReviews.cardsTotalMean-1} editable={false}/>
-                                    <div>{`(${data.getProfileInfo.cardReviews.cardsTotalReviews})`}</div>
-                                </ReviewContainer>
                                 <input style={{display: "none"}} id="file-upload" type="file" onChange={onNewImage}/>
                             </>
                             :
@@ -246,6 +242,10 @@ const Profile = (props: Props): JSX.Element => {
                                 <div>{data.getProfileInfo.username}</div>
                             </>
                         }
+                        <ReviewContainer>
+                            <ReviewStars starValue={data.getProfileInfo.cardReviews.cardsTotalMean-1} editable={false}/>
+                            <div>{`(${data.getProfileInfo.cardReviews.cardsTotalReviews})`}</div>
+                        </ReviewContainer>
                         <StatRow>
                             <div>{`Num Cubes: ${data.getProfileInfo.cubes.length}`}</div>
                             <div>{`Num reviews: ${data.getProfileInfo.numReviews}`}</div>

@@ -165,7 +165,7 @@ const PublicCubes = (props: Props): JSX.Element => {
                     <CardTitle>{cubeInfo.cardMainTitle}</CardTitle>
                     <CardText>{parse(cubeInfo.cardText)}</CardText>
                     {(props.creator !== cubeInfo.creator.creatorId) && 
-                        <button onClick={() => cloneCube().then(() => refetch())}>Clone</button>
+                        <FinishButton onClick={() => cloneCube().then(() => refetch())}>Clone</FinishButton>
                     }
                         {responseGetReview.data ?
                             <>
