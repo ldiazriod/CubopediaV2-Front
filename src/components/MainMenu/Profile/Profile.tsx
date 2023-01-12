@@ -217,7 +217,7 @@ const Profile = (props: Props): JSX.Element => {
                 <ModalWrapper>
                     <CardTitle>{cubeInfo.cardMainTitle}</CardTitle>
                     <CardText>{parse(cubeInfo.cardText)}</CardText>
-                    {!isUser.data?.isUser && <button onClick={() => [cloneCube(), closeModal()]}>Clone</button>}
+                    {!isUser.data?.isUser && <FinishButton onClick={() => [cloneCube(), closeModal()]}>Clone</FinishButton>}
                 </ModalWrapper>
             </Modal>
             {data && isUser.data &&

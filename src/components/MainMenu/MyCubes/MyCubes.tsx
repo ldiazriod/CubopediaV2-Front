@@ -277,12 +277,7 @@ const MyCubes = (props: Props): JSX.Element => {
                                         closeModal()
                                     }}>Upload</UploadButton>
                                 }
-                                <DeleteButton onClick={() => {
-                                    deleteCube().then(() => {
-                                        closeModal()
-                                        refetch()
-                                    })
-                                }}>Delete Cube</DeleteButton>
+                                <DeleteButton onClick={() => [deleteCube(), closeModal(),refetch()]}>Delete Cube</DeleteButton>
                             </>
                             :
                             <div style={{marginTop: "20px"}}>Creator: {cubeInfo.creator.username}</div>
