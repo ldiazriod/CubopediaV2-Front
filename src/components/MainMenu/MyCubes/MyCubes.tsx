@@ -36,7 +36,7 @@ type PersonalCubeInfo = {
         reviewMean: number,
         reviews: string[]
     }
-    public: boolean
+    publicCube: boolean
 }
 
 const GET_USER_CUBES = gql`
@@ -60,7 +60,7 @@ const GET_USER_CUBES = gql`
                 reviewMean,
                 reviews
             },
-            public
+            publicCube
         }
     }
 `
@@ -98,7 +98,7 @@ const defaultCubeState: PersonalCubeInfo = {
         reviews: []
     },
     cardImg: "",
-    public: false
+    publicCube: false
 }
 
 //getCubesByUser
@@ -169,7 +169,7 @@ const MyCubes = (props: Props): JSX.Element => {
         }
         setCubeInfo(auxCube)
         const aux = Object.entries(auxCube).map(([key, value]) => {
-            if(key !== "cubeModel" && key !== "cubeBrand" && key !== "cubeDesigner" && key !== "public"){
+            if(key !== "cubeModel" && key !== "cubeBrand" && key !== "cubeDesigner" && key !== "publicCube"){
                 if(selectValue && key === "cubeModName"){
                     if(value !== null){
                         if(value.toString().length !== 0){
@@ -269,7 +269,7 @@ const MyCubes = (props: Props): JSX.Element => {
                         <CardText>{parse(cubeInfo.cardText)}</CardText>
                         {props.creator === cubeInfo.creator.creatorId ? 
                             <>
-                                {cubeInfo.public ? 
+                                {cubeInfo.publicCube ? 
                                     <UploadButton onClick={() => [setAddCube(true), closeModal()]}>Update</UploadButton>
                                     :
                                     <UploadButton onClick={() => {

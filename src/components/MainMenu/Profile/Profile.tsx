@@ -144,7 +144,7 @@ const Profile = (props: Props): JSX.Element => {
     const {data, error, loading, refetch} = useQuery<{getProfileInfo: ProfileInfo}>(GET_PROFILE, {
         variables: {
             input: {
-                authToken: props.authToken,
+                authToken: props.authToken ? props.authToken : undefined,
                 id: props.creator 
             }
         }
@@ -201,6 +201,10 @@ const Profile = (props: Props): JSX.Element => {
         })
         refetch()
     }
+    useEffect(()=> {
+        refetch()
+    },[])
+
     if(error){
         return <div>{`${error}`}</div>
     }

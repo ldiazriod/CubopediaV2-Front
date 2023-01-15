@@ -21,6 +21,7 @@ const client = new ApolloClient({
 function App() {
   const [selector, setSelector] = useState<boolean>(false)
   const [logIn, setLogIn] = useState<boolean>(false)
+  const [goBack, setGoBack] = useState<boolean>(true)
   const user = useSelector<{user: {authToken: string, creator: string}}, any>((state: {user: {authToken: string, creator: string}}) => state)
   return (
     <ApolloProvider client={client}>
@@ -37,11 +38,11 @@ function App() {
               </MainContainer>
             :
             <>
-              <GoBackButton onClick={() => setSelector(false)}>Go back</GoBackButton>
+              {goBack && <GoBackButton onClick={() => setSelector(false)}>Go back</GoBackButton>}
               {logIn ?
                 <LogIn setSelector={setSelector}/>
                 :
-                <SignUp/>
+                <SignUp setGoBack={setGoBack}/>
               }
             </>
           :  <MainMenu authToken={user.user.authToken} userId={user.user.creator}/>
