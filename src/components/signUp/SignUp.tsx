@@ -1,10 +1,16 @@
 import React, {useState, useRef} from "react";
 import styled from "styled-components"
 import { DocumentNode, gql, useMutation } from "@apollo/client";
+import {useDispatch} from "react-redux"
 import axios from "axios"
 
 import {MainDiv} from "../../styles/globalStyles";
 import MainMenu from "../MainMenu/MainMenu";
+import { logIn } from "../../redux/userReducer";
+
+type Props = {
+    setGoBack: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 type UserInfo = {
     email: string,
@@ -47,12 +53,13 @@ const initialAlerts = {
 }
 const ADD_USER: DocumentNode = gql`
     mutation signUp($email: String!, $username: String!, $password: String!){
-        signUp(email: $email, username: $username, password: $password)
+        signUp(email: $email, username: $username, password: $password){
+            authToken,
+            creator
+        }
     }
 `
-const SignUp = (): JSX.Element => {
-    const captchaRef = useRef<any>()
-    const [captchaToken, setCaptchaToken] = useState(null);
+const SignUp = (props: Props): JSX.Element => {
     const [userInfo, setUserInfo] = useState<UserInfo>(initialUserInfo)
     const [alerts, setAlerts] = useState<AlertsType>(initialAlerts)
     const [next, setNext] = useState<boolean>(false);
@@ -64,10 +71,13 @@ const SignUp = (): JSX.Element => {
             password: userInfo.password
         }
     })
-
+    const dispatch = useDispatch()
     const onClickFinish = () => {
-        signUp()
-        setFinish(true)
+        signUp().then((response)=> {
+            setFinish(true)
+            dispatch(logIn({authToken: response.data.signUp.authToken, creator: response.data.signUp.creator}))
+            props.setGoBack(false)
+        })
     }
 
     const onClickNext = async() => {
@@ -89,12 +99,6 @@ const SignUp = (): JSX.Element => {
         }else if(userInfo.password.length === 0){
             setAlerts({...alerts, noPassword: true})
         }
-    }
-
-    const verify = () => {
-        captchaRef.current.getResponse().then((response: any)=>{
-            setCaptchaToken(response)
-        })
     }
     return(
         <MainDiv>
@@ -127,11 +131,11 @@ const SignUp = (): JSX.Element => {
                                 <Input type="text" placeholder="Name" autoComplete="false" value={userInfo.name} onChange={(e) =>setUserInfo({...userInfo, name: e.target.value})}/>
                                 <Input type="text" placeholder="Last name" autoComplete="false" value={userInfo.lastname} onChange={(e) => setUserInfo({...userInfo, lastname: e.target.value})}/>
                             </InputContainer>
-                            <Button onClick={onClickFinish} disabled={captchaToken === null ? true : false}>Finish</Button>
+                            <Button onClick={onClickFinish}>Finish</Button>
                         </>
                     }
                 </MainWrapper>
-                : data && <MainMenu authToken={data.authToken} userId={data.creator}/>
+                : data && <MainMenu authToken={data.signUp.authToken} userId={data.signUp.creator}/>
             }
         </MainDiv>
     )
