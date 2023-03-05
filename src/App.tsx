@@ -12,45 +12,45 @@ import { useSelector } from 'react-redux';
 import MainMenu from './components/MainMenu/MainMenu';
 
 const client = new ApolloClient({
-  uri: process.env.REACT_APP_API_URL,
-  cache: new InMemoryCache({
-    addTypename: false
-  }),
+	uri: process.env.REACT_APP_API_URL,
+	cache: new InMemoryCache({
+		addTypename: false
+	}),
 });
 
 function App() {
-  const [selector, setSelector] = useState<boolean>(false)
-  const [logIn, setLogIn] = useState<boolean>(false)
-  const [goBack, setGoBack] = useState<boolean>(true)
-  const user = useSelector<{user: {authToken: string, creator: string}}, any>((state: {user: {authToken: string, creator: string}}) => state)
-  return (
-    <ApolloProvider client={client}>
-      <PersistGate loading={null} persistor={persistor}>
-        <div className="App">
-          {!user.isLoggedIn ?
-            !selector ?
-              <MainContainer>
-                <ButtonsContainer>              
-                  <Button onClick={() => [setSelector(true), setLogIn(true)]}>Log In</Button>
-                  <Button onClick={() => [setSelector(true), setLogIn(false)]}>Sign Up</Button>
-                </ButtonsContainer>
-                <Img src={mainLogo}/>
-              </MainContainer>
-            :
-            <>
-              {goBack && <GoBackButton onClick={() => setSelector(false)}>Go back</GoBackButton>}
-              {logIn ?
-                <LogIn setSelector={setSelector}/>
-                :
-                <SignUp setGoBack={setGoBack}/>
-              }
-            </>
-          :  <MainMenu authToken={user.user.authToken} userId={user.user.creator}/>
-          }
-        </div>
-      </PersistGate>
-    </ApolloProvider>
-  );
+	const [selector, setSelector] = useState<boolean>(false)
+	const [logIn, setLogIn] = useState<boolean>(false)
+	const [goBack, setGoBack] = useState<boolean>(true)
+	const user = useSelector<{ user: { authToken: string, creator: string } }, any>((state: { user: { authToken: string, creator: string } }) => state)
+	return (
+		<ApolloProvider client={client}>
+			<PersistGate loading={null} persistor={persistor}>
+				<div className="App">
+					{!user.isLoggedIn ?
+						!selector ?
+							<MainContainer>
+								<ButtonsContainer>
+									<Button onClick={() => [setSelector(true), setLogIn(true)]}>Log In</Button>
+									<Button onClick={() => [setSelector(true), setLogIn(false)]}>Sign Up</Button>
+								</ButtonsContainer>
+								<Img src={mainLogo} />
+							</MainContainer>
+							:
+							<>
+								{goBack && <GoBackButton onClick={() => setSelector(false)}>Go back</GoBackButton>}
+								{logIn ?
+									<LogIn setSelector={setSelector} />
+									:
+									<SignUp setGoBack={setGoBack} />
+								}
+							</>
+						: <MainMenu authToken={user.user.authToken} userId={user.user.creator} />
+					}
+				</div>
+			</PersistGate>
+		</ApolloProvider>
+	);
 }
 
 export default App;

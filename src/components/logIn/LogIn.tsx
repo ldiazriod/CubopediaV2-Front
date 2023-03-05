@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import styled, { StyledComponent } from "styled-components"
 import { DocumentNode, gql, useMutation } from "@apollo/client";
-import {useDispatch, useSelector} from "react-redux"
-import {logIn} from "../../redux/userReducer"
+import { useDispatch, useSelector } from "react-redux"
+import { logIn } from "../../redux/userReducer"
 
-import {MainDiv} from "../../styles/globalStyles";
+import { MainDiv } from "../../styles/globalStyles";
 import MainMenu from "../MainMenu/MainMenu";
 import { UserRedux } from "../../types/reduxTypes";
 
@@ -27,17 +27,17 @@ const LogIn = (props: Props): JSX.Element => {
     const [password, setPassword] = useState<string>("");
     const [noUser, setNotUser] = useState<boolean>(false)
     const [log, setLog] = useState<boolean>(false)
-    const [logInM, {data, error, loading}] = useMutation(LOG_IN, {
+    const [logInM, { data, error, loading }] = useMutation(LOG_IN, {
         variables: {
             email: nameEmail,
             username: nameEmail,
             password: password
         }
-    }); 
+    });
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if(user.isLoggedIn){
+        if (user.isLoggedIn) {
             setLog(true)
         }
     }, [])
@@ -45,11 +45,11 @@ const LogIn = (props: Props): JSX.Element => {
     const onClickLog = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         logInM().then((response) => {
-            if(!response.data){
+            if (!response.data) {
                 setNotUser(true)
-            }else{
-                if(response.data.logIn.authToken){
-                    dispatch(logIn({authToken: response.data.logIn.authToken, creator: response.data.logIn.creator}))
+            } else {
+                if (response.data.logIn.authToken) {
+                    dispatch(logIn({ authToken: response.data.logIn.authToken, creator: response.data.logIn.creator }))
                     setNotUser(false)
                     setLog(true)
                     props.setSelector(false)
@@ -58,23 +58,23 @@ const LogIn = (props: Props): JSX.Element => {
         })
     }
 
-    if(loading){
+    if (loading) {
         return <div>Loading...</div>
     }
 
-    return(
+    return (
         <MainDiv>
             {!log ?
                 <MainWrapper>
                     <TextSpan>Welcome to Cubepedia!</TextSpan>
                     <InputContainer>
-                        <Input state={noUser} type="text" placeholder="email/username" autoComplete="false" value={nameEmail} onChange={(e) => setNameEmail(e.target.value)}/>
-                        <Input state={noUser} type="password" placeholder="password" autoComplete="false"value={password} onChange={(e) => setPassword(e.target.value)}/>
+                        <Input state={noUser} type="text" placeholder="email/username" autoComplete="false" value={nameEmail} onChange={(e) => setNameEmail(e.target.value)} />
+                        <Input state={noUser} type="password" placeholder="password" autoComplete="false" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </InputContainer>
                     {noUser && <div>Incorrect password or mail/username</div>}
                     <Button onClick={onClickLog}>Log In</Button>
                 </MainWrapper>
-                : (data !== undefined || user.isLoggedIn) && <MainMenu authToken={user.isLoggedIn ? user.authToken : data.logIn.authToken} userId={user.isLoggedIn ? user.creator : data.logIn.creator}/>
+                : (data !== undefined || user.isLoggedIn) && <MainMenu authToken={user.isLoggedIn ? user.authToken : data.logIn.authToken} userId={user.isLoggedIn ? user.creator : data.logIn.creator} />
             }
         </MainDiv>
     )
@@ -105,7 +105,7 @@ const InputContainer = styled.div`
     align-items: center;
     justify-content: center;
 `
-const Input = styled.input<{state?: boolean | undefined}>`
+const Input = styled.input<{ state?: boolean | undefined }>`
     border: 1px solid ${props => props.state ? "red" : "transparent"};
     width: 300px;
     margin: 10px;

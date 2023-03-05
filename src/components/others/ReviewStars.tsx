@@ -20,7 +20,7 @@ type CubeInfo = {
     cardReviewPoints: {
         reviewMean: number,
         reviews: string[]
-    }    
+    }
     public?: boolean
 }
 
@@ -45,21 +45,21 @@ const ReviewStars = (props: Props) => {
     const [addReview] = useMutation(ADD_REVIEW)
     return (
         <div>
-            {new Array(5).fill(0).map((_,i) => {
-                return <Button index={i} value={starValue} onClick={() =>{
-                    if(editable){
+            {new Array(5).fill(0).map((_, i) => {
+                return <Button index={i} value={starValue} onClick={() => {
+                    if (editable) {
                         setStarValue(i)
-                        addReview({variables: {input: {userId: props.userId, cubeId: props.cubeId, points: i+1}}})
-                        if(props.closeModal){
+                        addReview({ variables: { input: { userId: props.userId, cubeId: props.cubeId, points: i + 1 } } })
+                        if (props.closeModal) {
                             props.closeModal()
                         }
-                        if(props.refetch){
+                        if (props.refetch) {
                             props.refetch()
                         }
                         setEditable(false)
                     }
                 }}>
-                    <span style={{fontSize: "20px"}}>&#9733;</span>
+                    <span style={{ fontSize: "20px" }}>&#9733;</span>
                 </Button>
             })}
         </div>
@@ -68,7 +68,7 @@ const ReviewStars = (props: Props) => {
 
 export default ReviewStars
 
-const Button = styled.button<{value: number, index: number}>`
+const Button = styled.button<{ value: number, index: number }>`
     background: transparent;
     border: none;
     outline: none;

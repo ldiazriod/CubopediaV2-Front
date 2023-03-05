@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import styled, { StyledComponent } from "styled-components"
 import { DocumentNode, gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import Modal from "react-modal";
 import parse from "html-react-parser";
 
-import {MainDivRe} from "../../../styles/globalStyles";
+import { MainDivRe } from "../../../styles/globalStyles";
 import TextArea from "../../others/TextArea";
 import Profile from "../Profile/Profile";
 import ReviewStars from "../../others/ReviewStars";
@@ -41,7 +41,7 @@ type CubeInfo = {
     cardReviewPoints: {
         reviewMean: number,
         reviews: string[]
-    }    
+    }
     public?: boolean
 }
 
@@ -109,10 +109,10 @@ const PublicCubes = (props: Props): JSX.Element => {
     const [searchValues, setSearchValues] = useState<SearchValues>(defaultSearchState)
     const [page, setPage] = useState<number>(1)
     const [modal, setModal] = useState<boolean>(false)
-    const [cubeInfo, setCubeInfo] = useState<CubeInfo>({...defaultCubeState, creator: {creatorId: props.creator, username: ""}})
-    const [toProfile, setToProfile] = useState<{profile: boolean, creator: string}>({profile: false, creator: ""})
+    const [cubeInfo, setCubeInfo] = useState<CubeInfo>({ ...defaultCubeState, creator: { creatorId: props.creator, username: "" } })
+    const [toProfile, setToProfile] = useState<{ profile: boolean, creator: string }>({ profile: false, creator: "" })
     const [getReview, responseGetReview] = useLazyQuery(GET_REVIEW)
-    const {data, error, loading, refetch} = useQuery<{getPublicCubes: CubeInfo[]}>(SEARCH_PUBLIC_CUBES, {
+    const { data, error, loading, refetch } = useQuery<{ getPublicCubes: CubeInfo[] }>(SEARCH_PUBLIC_CUBES, {
         variables: {
             page: page,
             search: searchValues
@@ -126,7 +126,7 @@ const PublicCubes = (props: Props): JSX.Element => {
             }
         }
     })
-    const starOptions: number[] = [0,1,2,3,4,5]
+    const starOptions: number[] = [0, 1, 2, 3, 4, 5]
     const openModal = () => {
         setModal(true)
     }
@@ -138,22 +138,22 @@ const PublicCubes = (props: Props): JSX.Element => {
         refetch()
     }, [page, searchValues])
 
-    if(error){
+    if (error) {
         return <div>{`Error: ${error}`}</div>
     }
 
 
-    if(toProfile.profile){
+    if (toProfile.profile) {
         return (
             <>
-                <GoBackButton onClick={() => setToProfile({profile: false, creator: ""})}>Go Back</GoBackButton>
-                {props.creator === toProfile.creator ? <Profile creator={toProfile.creator} authToken={props.authToken}/> : <Profile creator={toProfile.creator}/>}
+                <GoBackButton onClick={() => setToProfile({ profile: false, creator: "" })}>Go Back</GoBackButton>
+                {props.creator === toProfile.creator ? <Profile creator={toProfile.creator} authToken={props.authToken} /> : <Profile creator={toProfile.creator} />}
             </>
         )
     }
     return (
         <MainDivRe>
-            <Loader loading={loading}/>
+            <Loader loading={loading} />
             <Modal
                 isOpen={modal}
                 onRequestClose={closeModal}
@@ -164,60 +164,60 @@ const PublicCubes = (props: Props): JSX.Element => {
                 <ModalWrapper>
                     <CardTitle>{cubeInfo.cardMainTitle}</CardTitle>
                     <CardText>{parse(cubeInfo.cardText)}</CardText>
-                    {(props.creator !== cubeInfo.creator.creatorId) && 
+                    {(props.creator !== cubeInfo.creator.creatorId) &&
                         <FinishButton onClick={() => cloneCube().then(() => refetch())}>Clone</FinishButton>
                     }
-                        {responseGetReview.data ?
-                            <>
-                                {responseGetReview.data.getReview.reviewed ? <div>
-                                    Your review
-                                    <ReviewStars starValue={responseGetReview.data.getReview.reviewValue-1} editable={!responseGetReview.data.getReview.reviewed}/>
-                                </div> : <div>
-                                    Add review
-                                    <ReviewStars starValue={responseGetReview.data.getReview.reviewValue-1} editable={!responseGetReview.data.getReview.reviewed} cubeId={cubeInfo._id} userId={props.creator} closeModal={closeModal} refetch={refetch}/>
-                                </div>
-                                }
-                            </>
-                            :
-                            <ReviewStars starValue={0} editable={false}/>
-                        }
+                    {responseGetReview.data ?
+                        <>
+                            {responseGetReview.data.getReview.reviewed ? <div>
+                                Your review
+                                <ReviewStars starValue={responseGetReview.data.getReview.reviewValue - 1} editable={!responseGetReview.data.getReview.reviewed} />
+                            </div> : <div>
+                                Add review
+                                <ReviewStars starValue={responseGetReview.data.getReview.reviewValue - 1} editable={!responseGetReview.data.getReview.reviewed} cubeId={cubeInfo._id} userId={props.creator} closeModal={closeModal} refetch={refetch} />
+                            </div>
+                            }
+                        </>
+                        :
+                        <ReviewStars starValue={0} editable={false} />
+                    }
                 </ModalWrapper>
             </Modal>
             <InputDisplay>
-                <Input type="text" placeholder="Title" value={searchValues ? searchValues.cardMainTitle : ""} onChange={(e) => setSearchValues(searchValues ? {...searchValues, cardMainTitle: e.target.value} : {cardMainTitle: e.target.value})}/>
-                <Input type="text" placeholder="Dimensions" value={searchValues ? searchValues.cubeDimensions : ""} onChange={(e) => setSearchValues(searchValues ? {...searchValues, cubeDimensions: e.target.value} : {cubeDimensions: e.target.value})}/>
+                <Input type="text" placeholder="Title" value={searchValues ? searchValues.cardMainTitle : ""} onChange={(e) => setSearchValues(searchValues ? { ...searchValues, cardMainTitle: e.target.value } : { cardMainTitle: e.target.value })} />
+                <Input type="text" placeholder="Dimensions" value={searchValues ? searchValues.cubeDimensions : ""} onChange={(e) => setSearchValues(searchValues ? { ...searchValues, cubeDimensions: e.target.value } : { cubeDimensions: e.target.value })} />
             </InputDisplay>
             <InputDisplay>
-                <Input type="text" placeholder="Cube Name" value={searchValues ? searchValues.cubeName : ""} onChange={(e) => setSearchValues(searchValues ? {...searchValues, cubeName: e.target.value} : {cubeName: e.target.value})}/>
-                <Select onChange={(e) =>  setSearchValues(searchValues ? {...searchValues, cardReviewPoints: Number(e.target.value)} : {cardReviewPoints: Number( e.target.value)})} value={searchValues ? searchValues.cardReviewPoints : starOptions[0]}>
+                <Input type="text" placeholder="Cube Name" value={searchValues ? searchValues.cubeName : ""} onChange={(e) => setSearchValues(searchValues ? { ...searchValues, cubeName: e.target.value } : { cubeName: e.target.value })} />
+                <Select onChange={(e) => setSearchValues(searchValues ? { ...searchValues, cardReviewPoints: Number(e.target.value) } : { cardReviewPoints: Number(e.target.value) })} value={searchValues ? searchValues.cardReviewPoints : starOptions[0]}>
                     {starOptions.map((elem) => {
                         return <option key={elem} value={elem}>
                             {`${elem} stars`}
                         </option>
                     })}
                 </Select>
-                <Select onChange={(e) => [setSearchValues({...searchValues, cubeType: e.target.value === "Normal" ? false : true}), console.log(searchValues.cubeType)]} value={searchValues.cubeType === false ? "Normal" : "Modded"}>
+                <Select onChange={(e) => [setSearchValues({ ...searchValues, cubeType: e.target.value === "Normal" ? false : true }), console.log(searchValues.cubeType)]} value={searchValues.cubeType === false ? "Normal" : "Modded"}>
                     <option value={"Normal"} selected>Normal</option>
                     <option value={"Modded"}>Modded</option>
                 </Select>
             </InputDisplay>
             <CubeWrapper>
                 {data && data.getPublicCubes.map((elem, i) => {
-                    return <SingleCubeCard key={i*10}>
+                    return <SingleCubeCard key={i * 10}>
                         <strong>{elem.cardMainTitle}</strong>
-                        <CreatorButton onClick={() => setToProfile({profile: true, creator: elem.creator.creatorId})}>{elem.creator.username}</CreatorButton>
+                        <CreatorButton onClick={() => setToProfile({ profile: true, creator: elem.creator.creatorId })}>{elem.creator.username}</CreatorButton>
                         <ReviewContainer>
-                            <ReviewStars starValue={elem.cardReviewPoints.reviewMean-1} editable={false}/>
+                            <ReviewStars starValue={elem.cardReviewPoints.reviewMean - 1} editable={false} />
                             <div>{`(${elem.cardReviewPoints.reviews.length})`}</div>
                         </ReviewContainer>
-                        <div onClick={() => [setCubeInfo(elem), getReview({variables: {input: {cubeId: elem._id, authToken: props.authToken}}}),openModal()]} style={{width: "100%"}}>
-                            <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`}/>
+                        <div onClick={() => [setCubeInfo(elem), getReview({ variables: { input: { cubeId: elem._id, authToken: props.authToken } } }), openModal()]} style={{ width: "100%" }}>
+                            <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
                         </div>
                     </SingleCubeCard>
                 })}
             </CubeWrapper>
-            {page > 1 && <button onClick={() => setPage(page-1)}>Prev</button>}
-            {(data && data.getPublicCubes.length === 20) && <FinishButton onClick={() => setPage(page+1)}>Next</FinishButton>}
+            {page > 1 && <button onClick={() => setPage(page - 1)}>Prev</button>}
+            {(data && data.getPublicCubes.length === 20) && <FinishButton onClick={() => setPage(page + 1)}>Next</FinishButton>}
         </MainDivRe>
     )
 }

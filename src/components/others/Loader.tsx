@@ -7,13 +7,13 @@ type Props = {
 
 const Loader = (props: Props) => {
     return <DivOverlay state={props.loading}>
-        <Load/>
+        <Load />
     </DivOverlay>
 }
 
 export default Loader
 
-const DivOverlay = styled.div<{state: boolean}>`
+const DivOverlay = styled.div<{ state: boolean }>`
     position: fixed;
     display: ${props => props.state ? "block" : "none"};
     width: 100%;
