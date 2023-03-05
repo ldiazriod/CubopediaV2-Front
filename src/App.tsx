@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import React, { useState } from 'react';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import './App.css';
 import SignUp from './components/signUp/SignUp';
 import LogIn from './components/logIn/LogIn';
 import styled from 'styled-components';
 import mainLogo from "./assets/CubopediaGrey.png"
 
-import { persistor, store } from './redux/configureStore';
+import { persistor } from './redux/configureStore';
 import { PersistGate } from 'redux-persist/integration/react';
 import { useSelector } from 'react-redux';
 import MainMenu from './components/MainMenu/MainMenu';

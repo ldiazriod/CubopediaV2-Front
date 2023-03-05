@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { MainDiv } from "../../styles/globalStyles";
 import MyCubes from "./MyCubes/MyCubes";
 import PublicCubes from "./PublicCubes/PublicCubes";
 import mainLogo from "../../assets/MiniCube.png"

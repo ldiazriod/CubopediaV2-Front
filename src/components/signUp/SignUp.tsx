@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import styled from "styled-components"
 import { DocumentNode, gql, useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux"
@@ -85,7 +85,7 @@ const SignUp = (props: Props): JSX.Element => {
             const strongPassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/
             const aux = strongPassword.test(userInfo.password)
             if (aux) {
-                const goodMail = (await axios.get<EmailValidation>(process.env.REACT_APP_EMAIL_API_URL!)).data
+                const goodMail = (await axios.get<EmailValidation>(process.env.REACT_APP_EMAIL_API_URL ? process.env.REACT_APP_EMAIL_API_URL : "" )).data
                 if (goodMail.deliverability === "DELIVERABLE" && !goodMail.is_disposable_email.value) {
                     setNext(true)
                 }

@@ -16,17 +16,17 @@ const TextArea = (props: Props) => {
         <Wrapper>
             <TextAreaStyle value={textEvent.text} onChange={(e) => [setTextEvent({ text: e.target.value, e: e }), props.setValue(textEvent.text.toString())]} onBlur={(e) => [setTextEvent({ text: e.target.value, e: e }), props.setValue(textEvent.text.toString())]} />
             <ButtonWrapper>
-                <Button state={textModifier[0]} onClick={(e) => {
+                <Button state={textModifier[0]} onClick={() => {
                     setTextEvent({ text: textEvent.text + (textModifier[0] ? "</strong>" : "<strong>"), e: (textEvent.e ? textEvent.e : undefined) })
                     setModifierValues(0);
                 }}
                 ><strong>N</strong></Button>
-                <Button state={textModifier[1]} onClick={(e) => {
+                <Button state={textModifier[1]} onClick={() => {
                     setTextEvent({ text: textEvent.text + (textModifier[1] ? "</i>" : "<i>"), e: (textEvent.e ? textEvent.e : undefined) })
                     setModifierValues(1);
                 }}
                 ><i>C</i></Button>
-                <Button state={textModifier[2]} onClick={(e) => {
+                <Button state={textModifier[2]} onClick={() => {
                     setTextEvent({ text: textEvent.text + (textModifier[2] ? "</u>" : "<u>"), e: (textEvent.e ? textEvent.e : undefined) })
                     setModifierValues(2);
                 }}

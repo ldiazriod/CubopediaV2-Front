@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled, { StyledComponent } from "styled-components"
+import styled from "styled-components"
 import { DocumentNode, gql, useMutation } from "@apollo/client";
 import { useDispatch, useSelector } from "react-redux"
 import { logIn } from "../../redux/userReducer"

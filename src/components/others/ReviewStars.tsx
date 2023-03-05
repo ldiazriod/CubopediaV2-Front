@@ -1,4 +1,4 @@
-import { ApolloQueryResult, gql, OperationVariables, useMutation, useQuery } from "@apollo/client";
+import { ApolloQueryResult, gql, OperationVariables, useMutation } from "@apollo/client";
 import React, { useState } from "react";
 import styled from "styled-components";
 
