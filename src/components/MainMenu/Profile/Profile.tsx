@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
-import styled, { StyledComponent } from "styled-components"
-import { DocumentNode, gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import styled from "styled-components"
+import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
 import Modal from "react-modal";
 import parse from "html-react-parser";
 import axios from "axios";
 
 import { MainDivRe } from "../../../styles/globalStyles";
-import TextArea from "../../others/TextArea";
 
-import { UserRedux } from "../../../types/reduxTypes";
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { logOut } from "../../../redux/userReducer"
 
 import defaultProfile from "../../../assets/defaultPicture.jpg"
@@ -186,20 +184,22 @@ const Profile = (props: Props): JSX.Element => {
     const onNewImage = async () => {
         const newFileForm = new FormData()
         const imgElement: HTMLInputElement = document.getElementById("file-upload") as HTMLInputElement;
-        const file = imgElement.files![0]
-        const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
-        const blob = file.slice(0, file.size, file.type)
-        newFileForm.append("upload", blob, newName)
-        await axios.post(`${process.env.REACT_APP_IMG_API_URL}/upload`, newFileForm)
-        await changeProfileImg({
-            variables: {
-                input: {
-                    imgName: newName,
-                    authToken: props.authToken
+        if(imgElement.files){
+            const file = imgElement.files[0]
+            const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
+            const blob = file.slice(0, file.size, file.type)
+            newFileForm.append("upload", blob, newName)
+            await axios.post(`${process.env.REACT_APP_IMG_API_URL}/upload`, newFileForm)
+            await changeProfileImg({
+                variables: {
+                    input: {
+                        imgName: newName,
+                        authToken: props.authToken
+                    }
                 }
-            }
-        })
-        refetch()
+            })
+            refetch()
+        }
     }
     useEffect(() => {
         refetch()
@@ -259,14 +259,12 @@ const Profile = (props: Props): JSX.Element => {
                         </StatRow>
                     </ProfileStats>
                     <CubeWrapper>
-                        {data.getProfileInfo.cubes.map((elem, i) => {
-                            return <SingleCubeCard key={i}>
+                        {data.getProfileInfo.cubes.map((elem, i) => <SingleCubeCard key={i}>
                                 <strong>{elem.cardMainTitle}</strong>
                                 <div onClick={() => [setCubeInfo(elem), openModal()]} style={{ width: "100%", cursor: "pointer" }}>
                                     <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
                                 </div>
-                            </SingleCubeCard>
-                        })}
+                            </SingleCubeCard>)}
                     </CubeWrapper>
                     {isUser.data.isUser &&
                         <>
@@ -404,7 +402,7 @@ const ReviewContainer = styled.div`
     justify-content: center;
     margin-bottom: 10px;
 `
-const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
+const CubeWrapper = styled.div`
     display: grid;
     align-items: center;
     justify-items: center;
@@ -412,7 +410,7 @@ const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
     width: 100%;
     height: fit-content;
 `
-const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
+const SingleCubeCard = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -425,7 +423,7 @@ const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
     margin-top: 30px;
     margin-bottom: 30px;
 `
-const CardImg: StyledComponent<"img", any, {}, never> = styled.img`
+const CardImg = styled.img`
     width: 90%;
     height: 200px;
     cursor: pointer;

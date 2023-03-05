@@ -1,5 +1,4 @@
-import parse from "html-react-parser";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 type Props = {
@@ -11,9 +10,7 @@ const TextArea = (props: Props) => {
     const [textEvent, setTextEvent] = useState<{ text: string, e: React.ChangeEvent<HTMLTextAreaElement> | undefined }>({ text: props.oldValue ? props.oldValue : "", e: undefined });
     const [textModifier, setTextModifier] = useState<boolean[]>([false, false, false])
     const setModifierValues = (index: number) => {
-        setTextModifier(textModifier.map((elem, i) => {
-            return i === index ? !elem : elem
-        }))
+        setTextModifier(textModifier.map((elem, i) => i === index ? !elem : elem))
     }
     return (
         <Wrapper>

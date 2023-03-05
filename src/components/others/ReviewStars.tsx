@@ -45,8 +45,8 @@ const ReviewStars = (props: Props) => {
     const [addReview] = useMutation(ADD_REVIEW)
     return (
         <div>
-            {new Array(5).fill(0).map((_, i) => {
-                return <Button index={i} value={starValue} onClick={() => {
+            {new Array(5).fill(0).map((_, i) =>
+                <Button index={i} value={starValue} key={i} onClick={() => {
                     if (editable) {
                         setStarValue(i)
                         addReview({ variables: { input: { userId: props.userId, cubeId: props.cubeId, points: i + 1 } } })
@@ -60,8 +60,7 @@ const ReviewStars = (props: Props) => {
                     }
                 }}>
                     <span style={{ fontSize: "20px" }}>&#9733;</span>
-                </Button>
-            })}
+                </Button>)}
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled, { StyledComponent } from "styled-components"
+import styled from "styled-components"
 import { gql, useMutation, useQuery } from "@apollo/client";
 import axios from "axios";
 import Modal from "react-modal";
@@ -249,12 +249,10 @@ const MyCubes = (props: Props): JSX.Element => {
                 }
                 {data && (data?.getCubesByUser.length !== 0) && !addCube &&
                     <CubeWrapper>
-                        {data.getCubesByUser.map((elem, i) => {
-                            return <SingleCubeCard onClick={() => [openModal(), setCubeInfo(elem)]} key={i}>
+                        {data.getCubesByUser.map((elem, i) => <SingleCubeCard onClick={() => [openModal(), setCubeInfo(elem)]} key={i}>
                                 <strong style={{ marginBottom: "15px", fontSize: "17px" }}>{elem.cardMainTitle}</strong>
                                 <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
-                            </SingleCubeCard>
-                        })}
+                            </SingleCubeCard>)}
                     </CubeWrapper>
                 }
                 <Modal
@@ -291,7 +289,7 @@ const MyCubes = (props: Props): JSX.Element => {
 
 export default MyCubes;
 
-const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
+const CubeWrapper = styled.div`
     display: grid;
     align-items: center;
     justify-items: center;
@@ -391,7 +389,7 @@ const RowInputCheckbox = styled.div`
     align-items: flex-start;
     width: 60%;
 `
-const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
+const SingleCubeCard = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -404,7 +402,7 @@ const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
     margin: 20px;
     cursor: pointer;
 `
-const CardImg: StyledComponent<"img", any, {}, never> = styled.img`
+const CardImg  = styled.img`
     width: 95%;
     height: 200px;
     border-radius: 8px;

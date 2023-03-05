@@ -5,11 +5,10 @@ type Props = {
     loading: boolean
 }
 
-const Loader = (props: Props) => {
-    return <DivOverlay state={props.loading}>
+const Loader = (props: Props) =>
+    <DivOverlay state={props.loading}>
         <Load />
     </DivOverlay>
-}
 
 export default Loader
 

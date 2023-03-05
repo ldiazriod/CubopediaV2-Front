@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import styled, { StyledComponent } from "styled-components"
+import styled  from "styled-components"
 import { DocumentNode, gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import Modal from "react-modal";
 import parse from "html-react-parser";
 
 import { MainDivRe } from "../../../styles/globalStyles";
-import TextArea from "../../others/TextArea";
 import Profile from "../Profile/Profile";
 import ReviewStars from "../../others/ReviewStars";
 import Loader from "../../others/Loader";
@@ -68,7 +67,7 @@ const defaultCubeState: CubeInfo = {
     public: false
 }
 
-const SEARCH_PUBLIC_CUBES = gql`
+const SEARCH_PUBLIC_CUBES: DocumentNode = gql`
     query getPublicCubes($page: Int!, $search: PublicSearch){
         getPublicCubes(page: $page, search: $search){
             _id,
@@ -92,12 +91,12 @@ const SEARCH_PUBLIC_CUBES = gql`
         }
     }
 `
-const CLONE_CUBE = gql`
+const CLONE_CUBE: DocumentNode = gql`
     mutation cloneCube($input: CloneInfo!){
         cloneCube(input: $input)
     }
 `
-const GET_REVIEW = gql`
+const GET_REVIEW: DocumentNode = gql`
 query getReview($input: GetReviewInput!){
     getReview(input: $input){
         reviewed,
@@ -190,11 +189,9 @@ const PublicCubes = (props: Props): JSX.Element => {
             <InputDisplay>
                 <Input type="text" placeholder="Cube Name" value={searchValues ? searchValues.cubeName : ""} onChange={(e) => setSearchValues(searchValues ? { ...searchValues, cubeName: e.target.value } : { cubeName: e.target.value })} />
                 <Select onChange={(e) => setSearchValues(searchValues ? { ...searchValues, cardReviewPoints: Number(e.target.value) } : { cardReviewPoints: Number(e.target.value) })} value={searchValues ? searchValues.cardReviewPoints : starOptions[0]}>
-                    {starOptions.map((elem) => {
-                        return <option key={elem} value={elem}>
+                    {starOptions.map((elem) => <option key={elem} value={elem}>
                             {`${elem} stars`}
-                        </option>
-                    })}
+                        </option>)}
                 </Select>
                 <Select onChange={(e) => [setSearchValues({ ...searchValues, cubeType: e.target.value === "Normal" ? false : true }), console.log(searchValues.cubeType)]} value={searchValues.cubeType === false ? "Normal" : "Modded"}>
                     <option value={"Normal"} selected>Normal</option>
@@ -202,8 +199,7 @@ const PublicCubes = (props: Props): JSX.Element => {
                 </Select>
             </InputDisplay>
             <CubeWrapper>
-                {data && data.getPublicCubes.map((elem, i) => {
-                    return <SingleCubeCard key={i * 10}>
+                {data && data.getPublicCubes.map((elem, i) => <SingleCubeCard key={i * 10}>
                         <strong>{elem.cardMainTitle}</strong>
                         <CreatorButton onClick={() => setToProfile({ profile: true, creator: elem.creator.creatorId })}>{elem.creator.username}</CreatorButton>
                         <ReviewContainer>
@@ -213,8 +209,7 @@ const PublicCubes = (props: Props): JSX.Element => {
                         <div onClick={() => [setCubeInfo(elem), getReview({ variables: { input: { cubeId: elem._id, authToken: props.authToken } } }), openModal()]} style={{ width: "100%" }}>
                             <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
                         </div>
-                    </SingleCubeCard>
-                })}
+                    </SingleCubeCard>)}
             </CubeWrapper>
             {page > 1 && <button onClick={() => setPage(page - 1)}>Prev</button>}
             {(data && data.getPublicCubes.length === 20) && <FinishButton onClick={() => setPage(page + 1)}>Next</FinishButton>}
@@ -224,7 +219,7 @@ const PublicCubes = (props: Props): JSX.Element => {
 
 export default PublicCubes;
 
-const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
+const CubeWrapper = styled.div`
     display: grid;
     align-items: center;
     justify-items: center;
@@ -232,7 +227,7 @@ const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
     width: 100%;
     height: fit-content;
 `
-const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
+const SingleCubeCard = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -263,7 +258,7 @@ const CardText = styled.span`
     height: 90%;
     min-height: 90%;
 `
-const CardImg: StyledComponent<"img", any, {}, never> = styled.img`
+const CardImg = styled.img`
     width: 90%;
     height: 200px;
     cursor: pointer;
