@@ -1,22 +1,21 @@
-import React, {useState, useEffect} from "react";
-import styled, { StyledComponent } from "styled-components"
-import { DocumentNode, gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import React, { useState, useEffect } from "react";
+import styled from "styled-components"
+import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
 import Modal from "react-modal";
 import parse from "html-react-parser";
 import axios from "axios";
 
-import {MainDivRe} from "../../../styles/globalStyles";
-import TextArea from "../../others/TextArea";
+import { MainDivRe } from "../../../styles/globalStyles";
 
-import { UserRedux } from "../../../types/reduxTypes";
-import {useDispatch, useSelector} from "react-redux"
-import {logOut} from "../../../redux/userReducer"
+import { useDispatch } from "react-redux"
+import { logOut } from "../../../redux/userReducer"
 
 import defaultProfile from "../../../assets/defaultPicture.jpg"
 import penIcon from "../../../assets/penIcon.png"
 import "./modalP.css"
 import ReviewStars from "../../others/ReviewStars";
 import Loader from "../../others/Loader";
+import s3AddImage from "../../../aws/functions/s3AddImage";
 
 type Props = {
     creator: string;
@@ -60,9 +59,9 @@ const defaultCubeState: ProfileCube = {
         reviews: []
     },
     cardImg: "",
-    cubeModName: "", 
-    cubeModel: "", 
-    cubeBrand: "", 
+    cubeModName: "",
+    cubeModel: "",
+    cubeBrand: "",
     cubeDesigner: ""
 }
 const SET_LOGOUT: DocumentNode = gql`
@@ -122,8 +121,8 @@ const DELETE_USER = gql`
 const Profile = (props: Props): JSX.Element => {
     const dispatch = useDispatch()
     const [modal, setModal] = useState<boolean>(false)
-    const [cubeInfo, setCubeInfo] = useState<ProfileCube>({...defaultCubeState})
-    const [deleteUserS, setDeleteUserS] = useState<{delete: boolean, password: string}>({delete: false, password: ""})
+    const [cubeInfo, setCubeInfo] = useState<ProfileCube>({ ...defaultCubeState })
+    const [deleteUserS, setDeleteUserS] = useState<{ delete: boolean, password: string }>({ delete: false, password: "" })
     const [changeProfileImg] = useMutation(UPDATE_PROFILE_IMG)
     const [deleteUser] = useMutation(DELETE_USER, {
         variables: {
@@ -133,7 +132,7 @@ const Profile = (props: Props): JSX.Element => {
             }
         }
     });
-    const isUser = useQuery<{isUser: boolean}>(IS_USER, {
+    const isUser = useQuery<{ isUser: boolean }>(IS_USER, {
         variables: {
             input: {
                 authToken: props.authToken,
@@ -141,11 +140,11 @@ const Profile = (props: Props): JSX.Element => {
             }
         }
     })
-    const {data, error, loading, refetch} = useQuery<{getProfileInfo: ProfileInfo}>(GET_PROFILE, {
+    const { data, error, loading, refetch } = useQuery<{ getProfileInfo: ProfileInfo }>(GET_PROFILE, {
         variables: {
             input: {
                 authToken: props.authToken ? props.authToken : undefined,
-                id: props.creator 
+                id: props.creator
             }
         }
     })
@@ -169,48 +168,49 @@ const Profile = (props: Props): JSX.Element => {
         setModal(false)
     }
 
-    const onLogOut = (e:  React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const onLogOut = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        dispatch(logOut({authToken: "", creator: ""}))
+        dispatch(logOut({ authToken: "", creator: "" }))
         logOutMutation()
     }
 
-    const onDelete = async(e:  React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const onDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         const deleted = await deleteUser()
-        if(deleted.data.deleteUser){
-            dispatch(logOut({authToken: "", creator: ""}))
+        if (deleted.data.deleteUser) {
+            dispatch(logOut({ authToken: "", creator: "" }))
         }
     }
 
-    const onNewImage = async() => {
-        const newFileForm = new FormData()
+    const onNewImage = async () => {
         const imgElement: HTMLInputElement = document.getElementById("file-upload") as HTMLInputElement;
-        const file = imgElement.files![0]
-        const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
-        const blob = file.slice(0, file.size, file.type)
-        newFileForm.append("upload", blob, newName)
-        await axios.post(`${process.env.REACT_APP_IMG_API_URL}/upload`, newFileForm)
-        await changeProfileImg({
-            variables: {
-                input: {
-                    imgName: newName,
-                    authToken: props.authToken
+        if(imgElement.files){
+            const file = imgElement.files[0]
+            const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
+            const blob = file.slice(0, file.size, file.type)
+            const newFile = new File([blob], newName)
+            await s3AddImage(newFile)
+            await changeProfileImg({
+                variables: {
+                    input: {
+                        imgName: newName,
+                        authToken: props.authToken
+                    }
                 }
-            }
-        })
-        refetch()
+            })
+            refetch()
+        }
     }
-    useEffect(()=> {
+    useEffect(() => {
         refetch()
-    },[])
+    }, [])
 
-    if(error){
+    if (error) {
         return <div>{`${error}`}</div>
     }
     return (
         <MainDivRe>
-            <Loader loading={loading}/>
+            <Loader loading={loading} />
             <Modal
                 isOpen={modal}
                 onRequestClose={closeModal}
@@ -225,29 +225,29 @@ const Profile = (props: Props): JSX.Element => {
                 </ModalWrapper>
             </Modal>
             {data && isUser.data &&
-                <> 
+                <>
                     <ProfileStats>
                         {isUser.data.isUser ?
                             <>
                                 <ProfileImgContainer>
-                                    <ProfileImg src={data.getProfileInfo.profileImg.length !== 0 ? `${process.env.REACT_APP_IMG_API_URL}/${data.getProfileInfo.profileImg}` : defaultProfile} alt="profileImg"/>
+                                    <ProfileImg src={data.getProfileInfo.profileImg.length !== 0 ? `${process.env.REACT_APP_IMG_API_URL}/${data.getProfileInfo.profileImg}` : defaultProfile} alt="profileImg" />
                                     <ProfileMiddle>
                                         <label htmlFor="file-upload">
-                                            <ProfileOverlayImg src={penIcon}/>
+                                            <ProfileOverlayImg src={penIcon} />
                                         </label>
                                     </ProfileMiddle>
                                 </ProfileImgContainer>
                                 <div>{data.getProfileInfo.username}</div>
-                                <input style={{display: "none"}} id="file-upload" type="file" onChange={onNewImage}/>
+                                <input style={{ display: "none" }} id="file-upload" type="file" onChange={onNewImage} />
                             </>
                             :
                             <>
-                                <PublicProfileImg src={data.getProfileInfo.profileImg.length !== 0 ? `${process.env.REACT_APP_IMG_API_URL}/${data.getProfileInfo.profileImg}` : defaultProfile} alt="profileImg"/>
+                                <PublicProfileImg src={data.getProfileInfo.profileImg.length !== 0 ? `${process.env.REACT_APP_IMG_API_URL}/${data.getProfileInfo.profileImg}` : defaultProfile} alt="profileImg" />
                                 <div>{data.getProfileInfo.username}</div>
                             </>
                         }
                         <ReviewContainer>
-                            <ReviewStars starValue={data.getProfileInfo.cardReviews.cardsTotalMean-1} editable={false}/>
+                            <ReviewStars starValue={data.getProfileInfo.cardReviews.cardsTotalMean - 1} editable={false} />
                             <div>{`(${data.getProfileInfo.cardReviews.cardsTotalReviews})`}</div>
                         </ReviewContainer>
                         <StatRow>
@@ -259,22 +259,20 @@ const Profile = (props: Props): JSX.Element => {
                         </StatRow>
                     </ProfileStats>
                     <CubeWrapper>
-                        {data.getProfileInfo.cubes.map((elem, i) => {
-                            return <SingleCubeCard key={i}>
+                        {data.getProfileInfo.cubes.map((elem, i) => <SingleCubeCard key={i}>
                                 <strong>{elem.cardMainTitle}</strong>
-                                <div onClick={() => [setCubeInfo(elem), openModal()]} style={{width: "100%", cursor: "pointer"}}>
-                                    <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`}/>
+                                <div onClick={() => [setCubeInfo(elem), openModal()]} style={{ width: "100%", cursor: "pointer" }}>
+                                    <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
                                 </div>
-                            </SingleCubeCard>
-                        })}
+                            </SingleCubeCard>)}
                     </CubeWrapper>
-                    {isUser.data.isUser && 
+                    {isUser.data.isUser &&
                         <>
                             <FinishButton onClick={onLogOut}>Log out</FinishButton>
-                            <DeleteButton onClick={() => setDeleteUserS({delete: true, password: ""})}>Delete User</DeleteButton>
-                            {deleteUserS.delete && 
+                            <DeleteButton onClick={() => setDeleteUserS({ delete: true, password: "" })}>Delete User</DeleteButton>
+                            {deleteUserS.delete &&
                                 <>
-                                    <Input type="password" placeholder="Add Password" value={deleteUserS.password} onChange={(e) => setDeleteUserS({...deleteUserS, password: e.target.value})}/>
+                                    <Input type="password" placeholder="Add Password" value={deleteUserS.password} onChange={(e) => setDeleteUserS({ ...deleteUserS, password: e.target.value })} />
                                     <DeleteButton onClick={onDelete}>Confirm</DeleteButton>
                                 </>
                             }
@@ -404,7 +402,7 @@ const ReviewContainer = styled.div`
     justify-content: center;
     margin-bottom: 10px;
 `
-const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
+const CubeWrapper = styled.div`
     display: grid;
     align-items: center;
     justify-items: center;
@@ -412,7 +410,7 @@ const CubeWrapper: StyledComponent<"div", any, {}, never> = styled.div`
     width: 100%;
     height: fit-content;
 `
-const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
+const SingleCubeCard = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -425,7 +423,7 @@ const SingleCubeCard: StyledComponent<"div", any, {}, never> = styled.div`
     margin-top: 30px;
     margin-bottom: 30px;
 `
-const CardImg: StyledComponent<"img", any, {}, never> = styled.img`
+const CardImg = styled.img`
     width: 90%;
     height: 200px;
     cursor: pointer;

@@ -1,6 +1,6 @@
-import styled, { StyledComponent } from "styled-components";
+import styled from "styled-components";
 
-export const MainDiv: StyledComponent<"div", any, {}, never> = styled.div`
+export const MainDiv= styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -12,7 +12,7 @@ export const MainDiv: StyledComponent<"div", any, {}, never> = styled.div`
     background-color: #F5F5F5;
 `
 
-export const MainDivRe: StyledComponent<"div", any, {}, never> = styled.div`
+export const MainDivRe= styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;

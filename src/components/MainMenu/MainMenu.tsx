@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { MainDiv } from "../../styles/globalStyles";
 import MyCubes from "./MyCubes/MyCubes";
 import PublicCubes from "./PublicCubes/PublicCubes";
 import mainLogo from "../../assets/MiniCube.png"
 import Profile from "./Profile/Profile";
- 
+
 type Props = {
     userId: string;
     authToken: string;
@@ -13,19 +12,19 @@ type Props = {
 
 const MainMenu = (props: Props): JSX.Element => {
     const [menu, setMenu] = useState<boolean[]>([true, false, false])
-    return(
+    return (
         <CustomMain>
             <LeftDiv>
-                <Img src={mainLogo}/>
+                <Img src={mainLogo} />
                 <Button state={menu[0]} onClick={() => setMenu([true, false, false])}>My Cubes</Button>
                 <Button state={menu[1]} onClick={() => setMenu([false, true, false])}>Find Cubes</Button>
                 <Button state={menu[2]} onClick={() => setMenu([false, false, true])}>Profile</Button>
             </LeftDiv>
             <RightDiv>
-                {menu[0] ? 
-                    <MyCubes authToken={props.authToken} creator={props.userId}/>
+                {menu[0] ?
+                    <MyCubes authToken={props.authToken} creator={props.userId} />
                     :
-                    menu[1] ? <PublicCubes creator={props.userId} authToken={props.authToken}/> : <Profile authToken={props.authToken} creator={props.userId}/>
+                    menu[1] ? <PublicCubes creator={props.userId} authToken={props.authToken} /> : <Profile authToken={props.authToken} creator={props.userId} />
                 }
             </RightDiv>
         </CustomMain>
@@ -57,7 +56,7 @@ const Img = styled.img`
     height: 100px;
     margin-bottom: 30px;
 `
-const Button = styled.button<{state: boolean}>`
+const Button = styled.button<{ state: boolean }>`
     background: ${props => props.state ? "#b31860" : "transparent"};
     color: ${props => props.state ? "white" : "black"};
     border-radius: 10px;
