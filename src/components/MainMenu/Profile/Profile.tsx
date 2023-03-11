@@ -15,6 +15,7 @@ import penIcon from "../../../assets/penIcon.png"
 import "./modalP.css"
 import ReviewStars from "../../others/ReviewStars";
 import Loader from "../../others/Loader";
+import s3AddImage from "../../../aws/functions/s3AddImage";
 
 type Props = {
     creator: string;
@@ -182,14 +183,13 @@ const Profile = (props: Props): JSX.Element => {
     }
 
     const onNewImage = async () => {
-        const newFileForm = new FormData()
         const imgElement: HTMLInputElement = document.getElementById("file-upload") as HTMLInputElement;
         if(imgElement.files){
             const file = imgElement.files[0]
             const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
             const blob = file.slice(0, file.size, file.type)
-            newFileForm.append("upload", blob, newName)
-            await axios.post(`${process.env.REACT_APP_IMG_API_URL}/upload`, newFileForm)
+            const newFile = new File([blob], newName)
+            await s3AddImage(newFile)
             await changeProfileImg({
                 variables: {
                     input: {

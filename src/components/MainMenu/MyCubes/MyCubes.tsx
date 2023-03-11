@@ -9,6 +9,7 @@ import { MainDivRe } from "../../../styles/globalStyles";
 import TextArea from "../../others/TextArea";
 import "./modal.css"
 import Loader from "../../others/Loader";
+import s3AddImage from "../../../aws/functions/s3AddImage";
 
 Modal.setAppElement("body")
 
@@ -155,16 +156,14 @@ const MyCubes = (props: Props): JSX.Element => {
     const onFinish = async () => {
         setLoadingCard(true)
         let auxCube = { ...cubeInfo, cardText: auxText }
-        const newFileForm = new FormData()
+        const imgElement: HTMLInputElement = document.getElementById("imgInput") as HTMLInputElement;
+        const file = imgElement.files![0]
+        const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
+        const blob = file.slice(0, file.size, file.type)
+        const newFile = new File([blob], newName)
         if (cubeInfo.cardImg.length === 0) {
-            const imgElement: HTMLInputElement = document.getElementById("imgInput") as HTMLInputElement;
             if (imgElement !== null && imgElement.files !== null) {
-                const file = imgElement.files![0]
-                const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
-                const blob = file.slice(0, file.size, file.type)
-                newFileForm.append("upload", blob, newName)
                 auxCube = { ...auxCube, cardImg: newName, cardText: `<div>${auxText} </div>` }
-                console.log(auxCube)
             }
         }
         setCubeInfo(auxCube)
@@ -195,7 +194,7 @@ const MyCubes = (props: Props): JSX.Element => {
         if (!aux.find((elem) => elem)) {
             if (cubeInfo.cardImg.length === 0 && !cubeInfo._id) {
                 await addCubeMutation({ variables: { info: { ...auxCube, creator: props.creator, cardReviewPoints: 0 } } }).then(async () => {
-                    await axios.post(`${process.env.REACT_APP_IMG_API_URL}/upload`, newFileForm)
+                    await s3AddImage(newFile)
                     refetch()
                 })
             } else {
