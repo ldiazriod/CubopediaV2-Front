@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components"
 import { gql, useMutation, useQuery } from "@apollo/client";
-import axios from "axios";
 import Modal from "react-modal";
 import parse from "html-react-parser";
 
 import { MainDivRe } from "../../../styles/globalStyles";
-import TextArea from "../../others/TextArea";
+import TextArea from "../../TextEditor/TextArea";
 import "./modal.css"
 import Loader from "../../others/Loader";
 import s3AddImage from "../../../aws/functions/s3AddImage";
@@ -113,7 +112,7 @@ const MyCubes = (props: Props): JSX.Element => {
     const [selectValue, setSelectValue] = useState<boolean>(false)
     const [addCube, setAddCube] = useState<boolean>(false)
     const [auxText, setAuxText] = useState<string>("")
-    const [inputStates, setInputStates] = useState<boolean[]>([])
+    const [inputStates] = useState<boolean[]>([])
     const [cubeInfo, setCubeInfo] = useState<PersonalCubeInfo>({ ...defaultCubeState, creator: { creatorId: props.creator, username: "" } })
     const [loadingCard, setLoadingCard] = useState<boolean>(false)
     const [changeCube] = useMutation(UPDATE_CUBE, {
@@ -163,7 +162,7 @@ const MyCubes = (props: Props): JSX.Element => {
         const newFile = new File([blob], newName)
         if (cubeInfo.cardImg.length === 0) {
             if (imgElement !== null && imgElement.files !== null) {
-                auxCube = { ...auxCube, cardImg: newName, cardText: `<div>${auxText} </div>` }
+                auxCube = { ...auxCube, cardImg: newName, cardText: `<p>${auxText} </p>` }
             }
         }
         setCubeInfo(auxCube)
