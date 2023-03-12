@@ -122,7 +122,7 @@ const SignUp = (props: Props): JSX.Element => {
                             e.target.value.length !== 0 && setAlerts({ ...alerts, noPassword: false })
                         ]} />
                     </InputContainer>
-                    {alerts.badPassword && <div>Password must be eight characters or longer and have 1 Lowercase, 1 uppercase, 1 numeric character and one special character</div>}
+                    {alerts.badPassword && <div>Password must be eight characters or longer and have at least 1 lowercase, 1 uppercase, 1 number and 1 symbol</div>}
                     <Button onClick={onClickNext}>Next</Button>
                 </> : <>
                     <TextSpan>Optional Info</TextSpan>
