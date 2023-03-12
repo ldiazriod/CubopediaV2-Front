@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { DocumentNode, gql, useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux"
 import axios from "axios"
+import validator from "validator";
 
 import { MainDiv } from "../../styles/globalStyles";
 import MainMenu from "../MainMenu/MainMenu";
@@ -82,9 +83,7 @@ const SignUp = (props: Props): JSX.Element => {
 
     const onClickNext = async () => {
         if (userInfo.email.length !== 0 && userInfo.username.length !== 0 && userInfo.password.length !== 0) {
-            const strongPassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/
-            const aux = strongPassword.test(userInfo.password)
-            if (aux) {
+            if (validator.isStrongPassword(userInfo.password)) {
                 const goodMail = (await axios.get<EmailValidation>(process.env.REACT_APP_EMAIL_API_URL ? process.env.REACT_APP_EMAIL_API_URL : "" )).data
                 if (goodMail.deliverability === "DELIVERABLE" && !goodMail.is_disposable_email.value) {
                     setNext(true)
@@ -123,7 +122,7 @@ const SignUp = (props: Props): JSX.Element => {
                             e.target.value.length !== 0 && setAlerts({ ...alerts, noPassword: false })
                         ]} />
                     </InputContainer>
-                    {alerts.badPassword && <div>Password must be eight characters or longer and have 1 Lowercase, 1 uppercase, 1 numeric character and one special character</div>}
+                    {alerts.badPassword && <div>Password must be eight characters or longer and have at least 1 lowercase, 1 uppercase, 1 number and 1 symbol</div>}
                     <Button onClick={onClickNext}>Next</Button>
                 </> : <>
                     <TextSpan>Optional Info</TextSpan>
