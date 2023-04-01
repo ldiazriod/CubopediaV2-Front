@@ -16,6 +16,8 @@ import "./modalP.css"
 import ReviewStars from "../../others/ReviewStars";
 import Loader from "../../others/Loader";
 import s3AddImage from "../../../aws/functions/s3AddImage";
+import LogIn from "../../logIn/LogIn";
+import App from "../../../App";
 
 type Props = {
     creator: string;
@@ -204,6 +206,8 @@ const Profile = (props: Props): JSX.Element => {
     useEffect(() => {
         refetch()
     }, [])
+
+
 
     if (error) {
         return <div>{`${error}`}</div>
