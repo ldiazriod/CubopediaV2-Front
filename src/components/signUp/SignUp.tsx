@@ -56,7 +56,8 @@ const ADD_USER: DocumentNode = gql`
     mutation signUp($email: String!, $username: String!, $password: String!){
         signUp(email: $email, username: $username, password: $password){
             authToken,
-            creator
+            creator,
+            verified
         }
     }
 `
@@ -77,7 +78,7 @@ const SignUp = (props: Props): JSX.Element => {
         signUp().then((response) => {
             setFinish(true)
             dispatch(logIn({ authToken: response.data.signUp.authToken, creator: response.data.signUp.creator }))
-            props.setGoBack(false)
+            //props.setGoBack(false)
         })
     }
 
@@ -134,7 +135,7 @@ const SignUp = (props: Props): JSX.Element => {
                 </>
                 }
             </MainWrapper>
-                : data && <MainMenu authToken={data.signUp.authToken} userId={data.signUp.creator} />
+                : data && <div>Verify your mail</div>
             }
         </MainDiv>
     )
