@@ -8,6 +8,8 @@ import { DocumentNode } from "graphql";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { logOut } from "../../redux/userReducer";
 import { useDispatch } from "react-redux";
+import { Default, Desktop, Mobile } from "../../mediaQueries/queriesComponents";
+import { isMobile } from "../../mediaQueries/queriesStates";
 
 type Props = {
     userId: string;
@@ -35,6 +37,7 @@ const SEND_MAIL: DocumentNode = gql`
 
 const MainMenu = (props: Props): JSX.Element => {
     const dispatch = useDispatch()
+    const isMobileState = isMobile()
     const [menu, setMenu] = useState<boolean[]>([true, false, false])
     const { data, error, loading } = useQuery<{ getUser: UserInfo }>(GET_USER, {
         variables: {
@@ -50,41 +53,51 @@ const MainMenu = (props: Props): JSX.Element => {
 
     useEffect(() => {
 
-        if(data && !data.getUser.verified){
+        if (data && !data.getUser.verified) {
             sendMail()
         }
     }, [data])
-    if(data && !data.getUser){
+    if (data && !data.getUser) {
         dispatch(logOut({ authToken: "", creator: "" }))
     }
     return (
         <>
             {data && (data.getUser.verified ?
-                <CustomMain>
-                    <LeftDiv>
-                        <Img src={mainLogo} />
-                        <Button state={menu[0]} onClick={() => setMenu([true, false, false])}>My Cubes</Button>
-                        <Button state={menu[1]} onClick={() => setMenu([false, true, false])}>Find Cubes</Button>
-                        <Button state={menu[2]} onClick={() => setMenu([false, false, true])}>Profile</Button>
-                    </LeftDiv>
-                    <RightDiv>
-                        {menu[0] ?
-                            <MyCubes authToken={props.authToken} creator={props.userId} />
-                            :
-                            menu[1] ? <PublicCubes creator={props.userId} authToken={props.authToken} /> : <Profile authToken={props.authToken} creator={props.userId} />
-                        }
-                    </RightDiv>
-                </CustomMain>
-            : <div>Verify Your Email</div>)}
+                <>
+                    <Mobile>
+                        <TopDiv>
+                            <Button state={menu[0]} onClick={() => setMenu([true, false, false])}>My Cubes</Button>
+                            <Button state={menu[1]} onClick={() => setMenu([false, true, false])}>Find Cubes</Button>
+                            <Button state={menu[2]} onClick={() => setMenu([false, false, true])}>Profile</Button>
+                        </TopDiv>
+                    </Mobile>
+                    <CustomMain screenSize={isMobileState}>
+                        <Default>
+                            <LeftDiv>
+                                <Img src={mainLogo} />
+                                <Button state={menu[0]} onClick={() => setMenu([true, false, false])}>My Cubes</Button>
+                                <Button state={menu[1]} onClick={() => setMenu([false, true, false])}>Find Cubes</Button>
+                                <Button state={menu[2]} onClick={() => setMenu([false, false, true])}>Profile</Button>
+                            </LeftDiv>
+                        </Default>
+                        <RightDiv screenSize={isMobileState}>
+                            {menu[0] ?
+                                <MyCubes authToken={props.authToken} creator={props.userId} />
+                                :
+                                menu[1] ? <PublicCubes creator={props.userId} authToken={props.authToken} /> : <Profile authToken={props.authToken} creator={props.userId} />}
+                        </RightDiv>
+                    </CustomMain>
+                </>
+                : <div>Verify Your Email</div>)}
         </>
     )
 }
 
 export default MainMenu
 
-const CustomMain = styled.div`
+const CustomMain = styled.div<{ screenSize: boolean }>`
     display: flex;
-    flex-direction: row;
+    flex-direction: ${props => props.screenSize ? "column" : "row"};
     width: 100%;
     height: 100%;
     min-height: 100vh;
@@ -97,8 +110,19 @@ const LeftDiv = styled.div`
     align-items: center;
     width: 15%;
 `
-const RightDiv = styled.div`
-    width: 80%;
+const TopDiv = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0px;
+    left: 5%;
+    width: 90%;
+    background: #f4f4f4;
+`
+const RightDiv = styled.div<{screenSize: boolean}>`
+    width: ${props => props.screenSize ? 100 : 80}%;
 `
 const Img = styled.img`
     width: 100px;

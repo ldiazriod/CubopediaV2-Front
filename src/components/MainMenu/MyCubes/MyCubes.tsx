@@ -288,10 +288,11 @@ const MyCubes = (props: Props): JSX.Element => {
 export default MyCubes;
 
 const CubeWrapper = styled.div`
-    display: grid;
+    display: flex;
     align-items: center;
     justify-items: center;
-    grid-template-columns: repeat(3, 1fr);    
+    flex-direction: row;
+    flex-wrap: wrap;
     width: 100%;
     height: 100%;
 `
@@ -429,7 +430,7 @@ const GoBackButton = styled.button<{ state: boolean }>`
     background: ${props => props.state ? "white" : "#b31860"};
     border: 2px solid #b31860;
     color: ${props => props.state ? "#b31860" : "white"};
-    width: 20%;
+    width: auto;
     padding: 10px 25px 10px 25px;
     margin-top: 20px;
     margin-bottom: 20px;
