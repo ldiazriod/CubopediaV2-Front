@@ -74,6 +74,7 @@ const ButtonWrapper = styled.div`
     display: flex;
     flex-direction: row;
     align-self: flex-start;
+    flex-wrap: wrap;
     width: 100%;
     padding: 10px;
     margin-left: 10px;

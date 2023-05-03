@@ -5,6 +5,7 @@ import Modal from "react-modal";
 import parse from "html-react-parser";
 import axios from "axios";
 
+import { modalResponsive, modalStyle } from "../../../styles/modalStyles";
 import { MainDivRe } from "../../../styles/globalStyles";
 
 import { useDispatch } from "react-redux"
@@ -12,12 +13,11 @@ import { logOut } from "../../../redux/userReducer"
 
 import defaultProfile from "../../../assets/defaultPicture.jpg"
 import penIcon from "../../../assets/penIcon.png"
-import "./modalP.css"
 import ReviewStars from "../../others/ReviewStars";
 import Loader from "../../others/Loader";
 import s3AddImage from "../../../aws/functions/s3AddImage";
-import LogIn from "../../logIn/LogIn";
-import App from "../../../App";
+import { isMobile } from "../../../mediaQueries/queriesStates";
+import { CardImg, SingleCubeCard } from "../../../styles/CubeCardStyles";
 
 type Props = {
     creator: string;
@@ -122,6 +122,7 @@ const DELETE_USER = gql`
 `
 const Profile = (props: Props): JSX.Element => {
     const dispatch = useDispatch()
+    const isMobileState = isMobile()
     const [modal, setModal] = useState<boolean>(false)
     const [cubeInfo, setCubeInfo] = useState<ProfileCube>({ ...defaultCubeState })
     const [deleteUserS, setDeleteUserS] = useState<{ delete: boolean, password: string }>({ delete: false, password: "" })
@@ -218,9 +219,8 @@ const Profile = (props: Props): JSX.Element => {
             <Modal
                 isOpen={modal}
                 onRequestClose={closeModal}
+                style={isMobileState ? modalResponsive : modalStyle}
                 contentLabel="CubeCard"
-                className="ModalP"
-                overlayClassName="Overlay"
             >
                 <ModalWrapper>
                     <CardTitle>{cubeInfo.cardMainTitle}</CardTitle>
@@ -263,7 +263,7 @@ const Profile = (props: Props): JSX.Element => {
                         </StatRow>
                     </ProfileStats>
                     <CubeWrapper>
-                        {data.getProfileInfo.cubes.map((elem, i) => <SingleCubeCard key={i}>
+                        {data.getProfileInfo.cubes.map((elem, i) => <SingleCubeCard key={i} state={isMobileState}>
                                 <strong>{elem.cardMainTitle}</strong>
                                 <div onClick={() => [setCubeInfo(elem), openModal()]} style={{ width: "100%", cursor: "pointer" }}>
                                     <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
@@ -407,28 +407,9 @@ const ReviewContainer = styled.div`
     margin-bottom: 10px;
 `
 const CubeWrapper = styled.div`
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    grid-template-columns: repeat(3, 1fr);    
-    width: 100%;
-    height: fit-content;
-`
-const SingleCubeCard = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
-    width: 300px;
-    height: fit-content;
-    background: white;
-    box-shadow: 0px 5px 5px #97949496;
-    border-radius: 8px;
-    padding: 10px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-`
-const CardImg = styled.img`
     width: 90%;
-    height: 200px;
-    cursor: pointer;
+    height: fit-content;
 `

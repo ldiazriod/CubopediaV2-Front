@@ -60,24 +60,28 @@ const MainMenu = (props: Props): JSX.Element => {
     if (data && !data.getUser) {
         dispatch(logOut({ authToken: "", creator: "" }))
     }
+    const onClickMenuButton = (index: number) => {
+        setMenu(menu.map((_, i) => i === index ? true : false))
+    }
+
     return (
         <>
             {data && (data.getUser.verified ?
                 <>
                     <Mobile>
                         <TopDiv>
-                            <Button state={menu[0]} onClick={() => setMenu([true, false, false])}>My Cubes</Button>
-                            <Button state={menu[1]} onClick={() => setMenu([false, true, false])}>Find Cubes</Button>
-                            <Button state={menu[2]} onClick={() => setMenu([false, false, true])}>Profile</Button>
+                            <Button style={{width: "30%"}} state={menu[0]} onClick={() => onClickMenuButton(0)}>My Cubes</Button>
+                            <Button style={{width: "30%"}} state={menu[1]} onClick={() => onClickMenuButton(1)}>Find Cubes</Button>
+                            <Button style={{width: "30%"}} state={menu[2]} onClick={() => onClickMenuButton(2)}>Profile</Button>
                         </TopDiv>
                     </Mobile>
                     <CustomMain screenSize={isMobileState}>
                         <Default>
                             <LeftDiv>
                                 <Img src={mainLogo} />
-                                <Button state={menu[0]} onClick={() => setMenu([true, false, false])}>My Cubes</Button>
-                                <Button state={menu[1]} onClick={() => setMenu([false, true, false])}>Find Cubes</Button>
-                                <Button state={menu[2]} onClick={() => setMenu([false, false, true])}>Profile</Button>
+                                <Button state={menu[0]} onClick={() => onClickMenuButton(0)}>My Cubes</Button>
+                                <Button state={menu[1]} onClick={() => onClickMenuButton(1)}>Find Cubes</Button>
+                                <Button state={menu[2]} onClick={() => onClickMenuButton(2)}>Profile</Button>
                             </LeftDiv>
                         </Default>
                         <RightDiv screenSize={isMobileState}>
@@ -118,8 +122,9 @@ const TopDiv = styled.div`
     position: sticky;
     top: 0px;
     left: 5%;
-    width: 90%;
+    width: 100%;
     background: #f4f4f4;
+    z-index: 1;
 `
 const RightDiv = styled.div<{screenSize: boolean}>`
     width: ${props => props.screenSize ? 100 : 80}%;
