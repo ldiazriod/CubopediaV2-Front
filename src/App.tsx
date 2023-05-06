@@ -10,54 +10,66 @@ import { persistor } from './redux/configureStore';
 import { PersistGate } from 'redux-persist/integration/react';
 import { useSelector } from 'react-redux';
 import MainMenu from './components/MainMenu/MainMenu';
+import { isMobile } from './mediaQueries/queriesStates';
+import { Default, Desktop, Mobile } from './mediaQueries/queriesComponents';
 
 const client = new ApolloClient({
-	uri: process.env.REACT_APP_API_URL,
-	cache: new InMemoryCache({
-		addTypename: false
-	}),
+    uri: process.env.REACT_APP_API_URL,
+    cache: new InMemoryCache({
+        addTypename: false
+    }),
 });
 
 function App() {
-	const [selector, setSelector] = useState<boolean>(false)
-	const [logIn, setLogIn] = useState<boolean>(false)
-	const [goBack, setGoBack] = useState<boolean>(true)
-	const user = useSelector<{ user: { authToken: string, creator: string } }, any>((state: { user: { authToken: string, creator: string } }) => state)
-	return (
-		<ApolloProvider client={client}>
-			<PersistGate loading={null} persistor={persistor}>
-				<div className="App">
-					{!user.isLoggedIn ?
-						!selector ?
-							<MainContainer>
-								<ButtonsContainer>
-									<Button onClick={() => [setSelector(true), setLogIn(true)]}>Log In</Button>
-									<Button onClick={() => [setSelector(true), setLogIn(false)]}>Sign Up</Button>
-								</ButtonsContainer>
-								<Img src={mainLogo} />
-							</MainContainer>
-							:
-							<>
-								{goBack && <GoBackButton onClick={() => setSelector(false)}>Go back</GoBackButton>}
-								{logIn ?
-									<LogIn setSelector={setSelector} />
-									:
-									<SignUp setGoBack={setGoBack} />
-								}
-							</>
-						: <MainMenu authToken={user.user.authToken} userId={user.user.creator} />
-					}
-				</div>
-			</PersistGate>
-		</ApolloProvider>
-	);
+    const [selector, setSelector] = useState<boolean>(false)
+    const [logIn, setLogIn] = useState<boolean>(false)
+    const [goBack, setGoBack] = useState<boolean>(true)
+    const user = useSelector<{ user: { authToken: string, creator: string } }, any>((state: { user: { authToken: string, creator: string } }) => state)
+    const isMobileState = isMobile()
+    return (
+        <ApolloProvider client={client}>
+            <PersistGate loading={null} persistor={persistor}>
+                <div className="App">
+                    {!user.isLoggedIn ?
+                        !selector ?
+                            <>
+                                <MainContainer screenSize={isMobileState}>
+                                    <Img src={mainLogo} />
+                                    <ButtonsContainer>
+                                        <Button onClick={() => [setSelector(true), setLogIn(true)]}>Log In</Button>
+                                        <Button onClick={() => [setSelector(true), setLogIn(false)]}>Sign Up</Button>
+                                    </ButtonsContainer>
+                                </MainContainer>
+                            </>
+                            :
+                            <>
+                                {goBack && <GoBackButton onClick={() => setSelector(false)}>Go back</GoBackButton>}
+                                {logIn ?
+                                    <LogIn setSelector={setSelector} />
+                                    :
+                                    <SignUp setGoBack={setGoBack} />
+                                }
+                            </>
+                        : <MainMenu authToken={user.user.authToken} userId={user.user.creator} />
+                    }
+                </div>
+            </PersistGate>
+        </ApolloProvider>
+    );
 }
 
 export default App;
 
-const MainContainer = styled.div`
+const MainContainer = styled.div<{screenSize: boolean}>`
     display: flex;
-    flex-direction: row;
+    flex-direction: ${props => props.screenSize ? "column" : "row"};
+    align-items: center;
+    justify-content: center;
+    transform: ${props => props.screenSize ? "translate(0, 0)" : "translate(0, 50%)"};
+`
+const MainContainerMobile = styled.div`
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -110,5 +122,6 @@ const Button = styled.button`
     }
 `
 const Img = styled.img`
-  
+    width: 400px;
+    height: 400px;
 `

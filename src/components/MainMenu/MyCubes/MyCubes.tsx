@@ -6,9 +6,11 @@ import parse from "html-react-parser";
 
 import { MainDivRe } from "../../../styles/globalStyles";
 import TextArea from "../../TextEditor/TextArea";
-import "./modal.css"
 import Loader from "../../others/Loader";
 import s3AddImage from "../../../aws/functions/s3AddImage";
+import { isMobile } from "../../../mediaQueries/queriesStates";
+import { CardImg, SingleCubeCard } from "../../../styles/CubeCardStyles";
+import { modalResponsive, modalStyle } from "../../../styles/modalStyles";
 
 Modal.setAppElement("body")
 
@@ -38,6 +40,8 @@ type PersonalCubeInfo = {
     }
     publicCube: boolean
 }
+
+
 
 const GET_USER_CUBES = gql`
     query getCubesByUser($authToken: String!) {
@@ -103,6 +107,7 @@ const defaultCubeState: PersonalCubeInfo = {
 
 //getCubesByUser
 const MyCubes = (props: Props): JSX.Element => {
+    const isMobileState = isMobile()
     const { data, error, loading, refetch } = useQuery<{ getCubesByUser: PersonalCubeInfo[] }>(GET_USER_CUBES, {
         variables: {
             authToken: props.authToken
@@ -157,7 +162,7 @@ const MyCubes = (props: Props): JSX.Element => {
         let auxCube = { ...cubeInfo, cardText: auxText }
         const imgElement: HTMLInputElement = document.getElementById("imgInput") as HTMLInputElement;
         const file = imgElement.files![0]
-        const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
+        const newName = `${Date.now() + "-" + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
         const blob = file.slice(0, file.size, file.type)
         const newFile = new File([blob], newName)
         if (cubeInfo.cardImg.length === 0) {
@@ -247,7 +252,7 @@ const MyCubes = (props: Props): JSX.Element => {
                 }
                 {data && (data?.getCubesByUser.length !== 0) && !addCube &&
                     <CubeWrapper>
-                        {data.getCubesByUser.map((elem, i) => <SingleCubeCard onClick={() => [openModal(), setCubeInfo(elem)]} key={i}>
+                        {data.getCubesByUser.map((elem, i) => <SingleCubeCard state={isMobileState} onClick={() => [openModal(), setCubeInfo(elem)]} key={i}>
                                 <strong style={{ marginBottom: "15px", fontSize: "17px" }}>{elem.cardMainTitle}</strong>
                                 <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
                             </SingleCubeCard>)}
@@ -256,9 +261,8 @@ const MyCubes = (props: Props): JSX.Element => {
                 <Modal
                     isOpen={modal}
                     onRequestClose={closeModal}
+                    style={isMobileState ? modalResponsive : modalStyle}
                     contentLabel="Cube card"
-                    className="ModalPersonal"
-                    overlayClassName="Overlay"
                 >
                     <ModalWrapper>
                         <CardTitle>{cubeInfo.cardMainTitle}</CardTitle>
@@ -288,11 +292,10 @@ const MyCubes = (props: Props): JSX.Element => {
 export default MyCubes;
 
 const CubeWrapper = styled.div`
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    grid-template-columns: repeat(3, 1fr);    
-    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 90%;
     height: 100%;
 `
 const InputWrapper = styled.div`
@@ -387,25 +390,6 @@ const RowInputCheckbox = styled.div`
     align-items: flex-start;
     width: 60%;
 `
-const SingleCubeCard = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 300px;
-    height: auto;
-    background: white;
-    box-shadow: 0px 5px 5px #97949496;
-    border-radius: 8px;
-    padding: 10px;
-    margin: 20px;
-    cursor: pointer;
-`
-const CardImg  = styled.img`
-    width: 95%;
-    height: 200px;
-    border-radius: 8px;
-    cursor: pointer;
-`
 const FinishButton = styled.button`
     background: #b31860;
     border: 2px solid #b31860;
@@ -429,7 +413,7 @@ const GoBackButton = styled.button<{ state: boolean }>`
     background: ${props => props.state ? "white" : "#b31860"};
     border: 2px solid #b31860;
     color: ${props => props.state ? "#b31860" : "white"};
-    width: 20%;
+    width: auto;
     padding: 10px 25px 10px 25px;
     margin-top: 20px;
     margin-bottom: 20px;
