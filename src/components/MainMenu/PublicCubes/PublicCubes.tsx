@@ -226,10 +226,12 @@ export default PublicCubes;
 
 const CubeWrapper = styled.div<{state: boolean}>`
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
-    align-items: center;
+    justify-content: ${props => props.state ? "center" : "normal"};
+    gap: 20px;
     width: 90%;
-    height: fit-content;
+    height: 100%;
 `
 const InputDisplay = styled.div<{ state: boolean }>`
     display: flex;

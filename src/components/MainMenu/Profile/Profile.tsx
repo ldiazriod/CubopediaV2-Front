@@ -123,6 +123,7 @@ const DELETE_USER = gql`
 const Profile = (props: Props): JSX.Element => {
     const dispatch = useDispatch()
     const isMobileState = isMobile()
+    const [loadingImg, setLoadingImg] = useState<boolean>(false)
     const [modal, setModal] = useState<boolean>(false)
     const [cubeInfo, setCubeInfo] = useState<ProfileCube>({ ...defaultCubeState })
     const [deleteUserS, setDeleteUserS] = useState<{ delete: boolean, password: string }>({ delete: false, password: "" })
@@ -188,6 +189,7 @@ const Profile = (props: Props): JSX.Element => {
     const onNewImage = async () => {
         const imgElement: HTMLInputElement = document.getElementById("file-upload") as HTMLInputElement;
         if(imgElement.files){
+            setLoadingImg(true)
             const file = imgElement.files[0]
             const newName = `${Date.now() + '-' + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
             const blob = file.slice(0, file.size, file.type)
@@ -202,6 +204,7 @@ const Profile = (props: Props): JSX.Element => {
                 }
             })
             refetch()
+            setLoadingImg(false)
         }
     }
     useEffect(() => {
@@ -215,7 +218,7 @@ const Profile = (props: Props): JSX.Element => {
     }
     return (
         <MainDivRe>
-            <Loader loading={loading} />
+            <Loader loading={loading || loadingImg} />
             <Modal
                 isOpen={modal}
                 onRequestClose={closeModal}
@@ -262,7 +265,7 @@ const Profile = (props: Props): JSX.Element => {
 
                         </StatRow>
                     </ProfileStats>
-                    <CubeWrapper>
+                    <CubeWrapper state={isMobileState}>
                         {data.getProfileInfo.cubes.map((elem, i) => <SingleCubeCard key={i} state={isMobileState}>
                                 <strong>{elem.cardMainTitle}</strong>
                                 <div onClick={() => [setCubeInfo(elem), openModal()]} style={{ width: "100%", cursor: "pointer" }}>
@@ -406,10 +409,12 @@ const ReviewContainer = styled.div`
     justify-content: center;
     margin-bottom: 10px;
 `
-const CubeWrapper = styled.div`
+const CubeWrapper = styled.div<{state: boolean}>`
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
-    align-items: center;
+    justify-content: ${props => props.state ? "center" : "normal"};
+    gap: 20px;
     width: 90%;
-    height: fit-content;
+    height: 100%;
 `
