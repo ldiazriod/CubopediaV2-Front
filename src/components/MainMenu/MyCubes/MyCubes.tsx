@@ -251,7 +251,7 @@ const MyCubes = (props: Props): JSX.Element => {
                     </InputWrapper>
                 }
                 {data && (data?.getCubesByUser.length !== 0) && !addCube &&
-                    <CubeWrapper>
+                    <CubeWrapper state={isMobileState}>
                         {data.getCubesByUser.map((elem, i) => <SingleCubeCard state={isMobileState} onClick={() => [openModal(), setCubeInfo(elem)]} key={i}>
                                 <strong style={{ marginBottom: "15px", fontSize: "17px" }}>{elem.cardMainTitle}</strong>
                                 <CardImg src={`${process.env.REACT_APP_IMG_API_URL}/${elem.cardImg}`} alt={`${elem.cubeName} img`} />
@@ -291,10 +291,12 @@ const MyCubes = (props: Props): JSX.Element => {
 
 export default MyCubes;
 
-const CubeWrapper = styled.div`
+const CubeWrapper = styled.div<{state: boolean}>`
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: ${props => props.state ? "center" : "normal"};
+    gap: 20px;
     width: 90%;
     height: 100%;
 `
