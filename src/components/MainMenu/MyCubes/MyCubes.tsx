@@ -161,13 +161,16 @@ const MyCubes = (props: Props): JSX.Element => {
         setLoadingCard(true)
         let auxCube = { ...cubeInfo, cardText: auxText }
         const imgElement: HTMLInputElement = document.getElementById("imgInput") as HTMLInputElement;
-        const file = imgElement.files![0]
-        const newName = `${Date.now() + "-" + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
-        const blob = file.slice(0, file.size, file.type)
-        const newFile = new File([blob], newName)
-        if (cubeInfo.cardImg.length === 0) {
-            if (imgElement !== null && imgElement.files !== null) {
-                auxCube = { ...auxCube, cardImg: newName, cardText: `<p>${auxText} </p>` }
+        let newFile = new File([], "")
+        if(imgElement){
+            const file = imgElement.files![0]
+            const newName = `${Date.now() + "-" + Math.round(Math.random() * 1E9)}-${props.creator}.${file.type.split("/")[1]}`
+            const blob = file.slice(0, file.size, file.type)
+            newFile = new File([blob], newName)
+            if (cubeInfo.cardImg.length === 0) {
+                if (imgElement !== null && imgElement.files !== null) {
+                    auxCube = { ...auxCube, cardImg: newName, cardText: `<p>${auxText} </p>` }
+                }
             }
         }
         setCubeInfo(auxCube)
@@ -277,7 +280,7 @@ const MyCubes = (props: Props): JSX.Element => {
                                         closeModal()
                                     }}>Upload</UploadButton>
                                 }
-                                <DeleteButton onClick={() => [deleteCube(), closeModal(), refetch()]}>Delete Cube</DeleteButton>
+                                <DeleteButton onClick={() => [deleteCube().then(() => refetch()), closeModal()]}>Delete Cube</DeleteButton>
                             </>
                             :
                             <div style={{ marginTop: "20px" }}>Creator: {cubeInfo.creator.username}</div>

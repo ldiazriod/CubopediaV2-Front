@@ -49,12 +49,13 @@ const ReviewStars = (props: Props) => {
                 <Button index={i} value={starValue} key={i} onClick={() => {
                     if (editable) {
                         setStarValue(i)
-                        addReview({ variables: { input: { userId: props.userId, cubeId: props.cubeId, points: i + 1 } } })
+                        addReview({ variables: { input: { userId: props.userId, cubeId: props.cubeId, points: i + 1 } } }).then(() => {
+                            if(props.refetch){
+                                props.refetch()
+                            }
+                        })
                         if (props.closeModal) {
                             props.closeModal()
-                        }
-                        if (props.refetch) {
-                            props.refetch()
                         }
                         setEditable(false)
                     }
